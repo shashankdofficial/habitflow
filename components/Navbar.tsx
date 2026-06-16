@@ -83,7 +83,7 @@ export function Navbar() {
         <Flex align="center" gap={4}>
           <IconButton
             display={{ base: "flex", md: "none" }}
-            aria="Menu"
+            aria-label="Menu"
             icon={<Menu size={20} />}
             onClick={onOpen}
             variant="ghost"

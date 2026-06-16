@@ -31,6 +31,8 @@ export default function CalendarPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const { habits, isLoading } = useHabits(user?.id);
+  const bg = useColorModeValue("gray.50", "gray.900");
+  const cardBg = useColorModeValue("white", "gray.800");
 
   const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -93,7 +95,7 @@ export default function CalendarPage() {
   if (!user) return null;
 
   return (
-    <Box minH="100vh" bg={useColorModeValue("gray.50", "gray.900")}>
+    <Box minH="100vh" bg={bg}>
       <Navbar />
       <Box maxW="6xl" mx="auto" px={4} py={8}>
         <VStack spacing={8} align="stretch">
@@ -114,7 +116,7 @@ export default function CalendarPage() {
             </Button>
           </Flex>
 
-          <Card bg={useColorModeValue("white", "gray.800")}>
+          <Card bg={cardBg}>
             <CardBody>
               <VStack spacing={6} align="stretch">
                 <Flex direction={{ base: "column", md: "row" }} justify="space-between" align="center" gap={4}>

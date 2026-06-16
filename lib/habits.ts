@@ -1,42 +1,75 @@
 import { Habit, HabitLog, StreakData } from "@/types";
 import { startOfDay, subDays, format } from "date-fns";
-import { supabase } from "./supabase";
+import { db } from "./firebase";
+import {
+  collection,
+  getDocs,
+  getDoc,
+  doc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  setDoc,
+} from "firebase/firestore";
 
 export async function getHabits(userId: string): Promise<Habit[]> {
-  const { data, error } = await supabase
-    .from("habits")
-    .select("*")
-    .eq("user_id", userId)
-    .eq("is_active", true)
-    .order("created_at", { ascending: false });
+  const habitsRef = collection(db, "habits");
+  const q = query(habitsRef, where("user_id", "==", userId));
+  const querySnapshot = await getDocs(q);
 
-  if (error) throw error;
-  return data || [];
+  const habits = querySnapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      user_id: data.user_id,
+      title: data.title,
+      description: data.description,
+      frequency: data.frequency,
+      days_of_week: data.days_of_week,
+      reminder_time: data.reminder_time,
+      color: data.color,
+      icon: data.icon,
+      is_active: data.is_active,
+      created_at: data.created_at,
+    } as Habit;
+  });
+
+  return habits
+    .filter((h) => h.is_active)
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+}
+
+function cleanUndefined(obj: any): any {
+  const clean: any = {};
+  Object.keys(obj).forEach((key) => {
+    if (obj[key] !== undefined) {
+      clean[key] = obj[key];
+    }
+  });
+  return clean;
 }
 
 export async function createHabit(habit: Omit<Habit, "id" | "created_at">) {
-  console.log("Inserting habit into Supabase:", habit);
+  console.log("Inserting habit into Firestore:", habit);
 
   try {
-    const { data, error } = await supabase
-      .from("habits")
-      .insert([habit])
-      .select()
-      .single();
+    const habitsRef = collection(db, "habits");
+    const cleanData = cleanUndefined({
+      ...habit,
+      created_at: new Date().toISOString(),
+    });
+    const docRef = await addDoc(habitsRef, cleanData);
 
-    if (error) {
-      console.error("Supabase error:", error);
-      console.error("Error details:", JSON.stringify(error, null, 2));
-
-      const errorMessage = error.message || "Unknown error";
-      const details = error.details || "";
-      const hint = error.hint || "";
-
-      throw new Error(`Failed to create habit: ${errorMessage}${details ? ` - ${details}` : ""}${hint ? ` (${hint})` : ""}`);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+      throw new Error("Habit creation failed: document does not exist after write");
     }
 
-    console.log("Habit created successfully:", data);
-    return data;
+    const createdHabit = { id: docSnap.id, ...docSnap.data() } as Habit;
+    console.log("Habit created successfully:", createdHabit);
+    return createdHabit;
   } catch (err) {
     console.error("createHabit error:", err);
     throw err;
@@ -44,61 +77,85 @@ export async function createHabit(habit: Omit<Habit, "id" | "created_at">) {
 }
 
 export async function updateHabit(id: string, updates: Partial<Habit>) {
-  const { data, error } = await supabase
-    .from("habits")
-    .update(updates)
-    .eq("id", id)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+  try {
+    const docRef = doc(db, "habits", id);
+    await updateDoc(docRef, cleanUndefined(updates));
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+      throw new Error("Habit update failed: document does not exist");
+    }
+    return { id: docSnap.id, ...docSnap.data() } as Habit;
+  } catch (err) {
+    console.error("updateHabit error:", err);
+    throw err;
+  }
 }
 
 export async function deleteHabit(id: string) {
-  const { error } = await supabase.from("habits").delete().eq("id", id);
-  if (error) throw error;
+  try {
+    const docRef = doc(db, "habits", id);
+    await deleteDoc(docRef);
+  } catch (err) {
+    console.error("deleteHabit error:", err);
+    throw err;
+  }
 }
 
 export async function getHabitLogs(habitId: string): Promise<HabitLog[]> {
-  const { data, error } = await supabase
-    .from("habit_logs")
-    .select("*")
-    .eq("habit_id", habitId)
-    .order("date", { ascending: false });
+  try {
+    const logsRef = collection(db, "habit_logs");
+    const q = query(logsRef, where("habit_id", "==", habitId));
+    const querySnapshot = await getDocs(q);
 
-  if (error) throw error;
-  return data || [];
+    const logs = querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        habit_id: data.habit_id,
+        date: data.date,
+        status: data.status,
+        created_at: data.created_at,
+      } as HabitLog;
+    });
+
+    return logs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  } catch (err) {
+    console.error("getHabitLogs error:", err);
+    throw err;
+  }
 }
 
 export async function checkInHabit(habitId: string, date: Date) {
-  const dateStr = format(date, "yyyy-MM-dd");
-  const { data, error } = await supabase
-    .from("habit_logs")
-    .upsert(
-      {
-        habit_id: habitId,
-        date: dateStr,
-        status: "completed",
-      },
-      { onConflict: "habit_id,date" }
-    )
-    .select()
-    .single();
+  try {
+    const dateStr = format(date, "yyyy-MM-dd");
+    const docId = `${habitId}_${dateStr}`;
+    const logRef = doc(db, "habit_logs", docId);
 
-  if (error) throw error;
-  return data;
+    const logData = {
+      habit_id: habitId,
+      date: dateStr,
+      status: "completed",
+      created_at: new Date().toISOString(),
+    };
+
+    await setDoc(logRef, logData, { merge: true });
+    return { id: docId, ...logData } as HabitLog;
+  } catch (err) {
+    console.error("checkInHabit error:", err);
+    throw err;
+  }
 }
 
 export async function undoCheckIn(habitId: string, date: Date) {
-  const dateStr = format(date, "yyyy-MM-dd");
-  const { error } = await supabase
-    .from("habit_logs")
-    .delete()
-    .eq("habit_id", habitId)
-    .eq("date", dateStr);
-
-  if (error) throw error;
+  try {
+    const dateStr = format(date, "yyyy-MM-dd");
+    const docId = `${habitId}_${dateStr}`;
+    const logRef = doc(db, "habit_logs", docId);
+    await deleteDoc(logRef);
+  } catch (err) {
+    console.error("undoCheckIn error:", err);
+    throw err;
+  }
 }
 
 export function calculateStreak(logs: HabitLog[]): StreakData {

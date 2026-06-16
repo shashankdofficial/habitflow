@@ -1,4 +1,4 @@
-// File: /Users/shashankdubey/Documents/habitflow/app/settings/page.tsx
+// File: E:\Shashank Dubey Workspace\Shashank Dubey Workspace\GitHub Personal Projects\habitflow\app\settings\page.tsx
 import * as entry from '../../../../app/settings/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

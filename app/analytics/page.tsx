@@ -29,6 +29,8 @@ export default function AnalyticsPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const { habits, isLoading } = useHabits(user?.id);
+  const bg = useColorModeValue("gray.50", "gray.900");
+  const cardBg = useColorModeValue("white", "gray.800");
 
   const { data: allLogs = [] } = useQuery({
     queryKey: ["allHabitLogs", user?.id],
@@ -161,7 +163,7 @@ export default function AnalyticsPage() {
   if (!user) return null;
 
   return (
-    <Box minH="100vh" bg={useColorModeValue("gray.50", "gray.900")}>
+    <Box minH="100vh" bg={bg}>
       <Navbar />
       <Box maxW="7xl" mx="auto" px={4} py={8}>
         <VStack spacing={8} align="stretch">
@@ -205,7 +207,7 @@ export default function AnalyticsPage() {
           </SimpleGrid>
 
           <SimpleGrid columns={{ base: 1, lg: 2 }} gap={6}>
-            <Card bg={useColorModeValue("white", "gray.800")}>
+            <Card bg={cardBg}>
               <CardBody>
                 <VStack align="stretch" spacing={4}>
                   <Heading size="md">Weekly Completion Rate</Heading>
@@ -224,7 +226,7 @@ export default function AnalyticsPage() {
               </CardBody>
             </Card>
 
-            <Card bg={useColorModeValue("white", "gray.800")}>
+            <Card bg={cardBg}>
               <CardBody>
                 <VStack align="stretch" spacing={4}>
                   <Heading size="md">30-Day Trend</Heading>
@@ -244,7 +246,7 @@ export default function AnalyticsPage() {
             </Card>
           </SimpleGrid>
 
-          <Card bg={useColorModeValue("white", "gray.800")}>
+          <Card bg={cardBg}>
             <CardBody>
               <VStack align="stretch" spacing={4}>
                 <Heading size="md">Habit Performance</Heading>
@@ -266,7 +268,7 @@ export default function AnalyticsPage() {
             </CardBody>
           </Card>
 
-          <Card bg={useColorModeValue("white", "gray.800")}>
+          <Card bg={cardBg}>
             <CardBody>
               <VStack align="stretch" spacing={4}>
                 <Heading size="md">Best Performing Days</Heading>

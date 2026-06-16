@@ -29,6 +29,8 @@ import toast from "react-hot-toast";
 export default function SettingsPage() {
   const router = useRouter();
   const { user, loading: authLoading, signOut } = useAuth();
+  const bg = useColorModeValue("gray.50", "gray.900");
+  const cardBg = useColorModeValue("white", "gray.800");
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -73,7 +75,7 @@ export default function SettingsPage() {
   if (!user) return null;
 
   return (
-    <Box minH="100vh" bg={useColorModeValue("gray.50", "gray.900")}>
+    <Box minH="100vh" bg={bg}>
       <Navbar />
       <Box maxW="4xl" mx="auto" px={4} py={8}>
         <VStack spacing={8} align="stretch">
@@ -93,7 +95,7 @@ export default function SettingsPage() {
             </Button>
           </Flex>
 
-          <Card bg={useColorModeValue("white", "gray.800")}>
+          <Card bg={cardBg}>
             <CardBody>
               <VStack align="stretch" spacing={6}>
                 <Flex align="center" gap={6}>
@@ -147,7 +149,7 @@ export default function SettingsPage() {
             </CardBody>
           </Card>
 
-          <Card bg={useColorModeValue("white", "gray.800")}>
+          <Card bg={cardBg}>
             <CardBody>
               <VStack align="stretch" spacing={4}>
                 <Heading size="md" display="flex" alignItems="center" gap={2}>
@@ -172,7 +174,7 @@ export default function SettingsPage() {
                   <Box>
                     <Text fontWeight="medium">Push Notifications</Text>
                     <Text fontSize="sm" color="gray.600">
-                      Get notified when it's time to complete habits
+                      Get notified when it&apos;s time to complete habits
                     </Text>
                   </Box>
                   <Switch
@@ -184,7 +186,7 @@ export default function SettingsPage() {
             </CardBody>
           </Card>
 
-          <Card bg={useColorModeValue("white", "gray.800")}>
+          <Card bg={cardBg}>
             <CardBody>
               <VStack align="stretch" spacing={4}>
                 <Heading size="md" display="flex" alignItems="center" gap={2}>
@@ -208,7 +210,7 @@ export default function SettingsPage() {
             </CardBody>
           </Card>
 
-          <Card bg={useColorModeValue("white", "gray.800")}>
+          <Card bg={cardBg}>
             <CardBody>
               <VStack align="stretch" spacing={4}>
                 <Heading size="md" display="flex" alignItems="center" gap={2}>

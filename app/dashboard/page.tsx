@@ -30,6 +30,8 @@ export default function DashboardPage() {
   const { todayHabits, isLoading, habitStreaks, getHabitStatus, setAllLogs } =
     useTodayHabits(user?.id);
   const queryClient = useQueryClient();
+  const bg = useColorModeValue("gray.50", "gray.900");
+  const cardBg = useColorModeValue("white", "gray.800");
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -37,7 +39,7 @@ export default function DashboardPage() {
     }
   }, [user, authLoading, router]);
 
-  const { data: allLogs = [] } = useQuery({
+  const { data: allLogs } = useQuery({
     queryKey: ["allHabitLogs", user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
@@ -58,8 +60,10 @@ export default function DashboardPage() {
     }
   }, [allLogs, setAllLogs]);
 
+  const logsList = allLogs || [];
+
   const completedToday = todayHabits.filter((habit) => {
-    const logs = allLogs.filter((log) => log.habit_id === habit.id && log.status === "completed");
+    const logs = logsList.filter((log) => log.habit_id === habit.id && log.status === "completed");
     const today = new Date();
     return logs.some((log) => {
       const logDate = new Date(log.date);
@@ -83,7 +87,7 @@ export default function DashboardPage() {
   if (!user) return null;
 
   return (
-    <Box minH="100vh" bg={useColorModeValue("gray.50", "gray.900")}>
+    <Box minH="100vh" bg={bg}>
       <Navbar />
       <Box maxW="6xl" mx="auto" px={4} py={8}>
         <VStack spacing={8} align="stretch">
@@ -91,7 +95,7 @@ export default function DashboardPage() {
             <Box>
               <Heading size="xl">Welcome back, {user.user_metadata?.name || "Friend"}! 👋</Heading>
               <Text color="gray.600" mt={2}>
-                Let's keep those streaks going!
+                Let&apos;s keep those streaks going!
               </Text>
             </Box>
             <Button
@@ -106,7 +110,7 @@ export default function DashboardPage() {
           </Flex>
 
           <SimpleGrid columns={{ base: 1, md: 3 }} gap={6}>
-            <Box bg={useColorModeValue("white", "gray.800")} p={6} borderRadius="lg">
+            <Box bg={cardBg} p={6} borderRadius="lg">
               <Flex align="center" gap={4}>
                 <Box
                   p={3}
@@ -118,7 +122,7 @@ export default function DashboardPage() {
                 </Box>
                 <VStack align="start" spacing={1}>
                   <Text fontSize="sm" color="gray.600">
-                    Today's Progress
+                    Today&apos;s Progress
                   </Text>
                   <Heading size="lg">
                     {completedToday}/{todayHabits.length}
@@ -136,7 +140,7 @@ export default function DashboardPage() {
               />
             </Box>
 
-            <Box bg={useColorModeValue("white", "gray.800")} p={6} borderRadius="lg">
+            <Box bg={cardBg} p={6} borderRadius="lg">
               <Flex align="center" gap={4}>
                 <Box
                   p={3}
@@ -158,7 +162,7 @@ export default function DashboardPage() {
               </Text>
             </Box>
 
-            <Box bg={useColorModeValue("white", "gray.800")} p={6} borderRadius="lg">
+            <Box bg={cardBg} p={6} borderRadius="lg">
               <Flex align="center" gap={4}>
                 <Box
                   p={3}
@@ -176,15 +180,15 @@ export default function DashboardPage() {
                 </VStack>
               </Flex>
               <Text fontSize="sm" color="gray.500" mt={4}>
-                You're building momentum! 💪
+                You&apos;re building momentum! 💪
               </Text>
             </Box>
           </SimpleGrid>
 
-          <Box bg={useColorModeValue("white", "gray.800")} borderRadius="lg" p={6}>
+          <Box bg={cardBg} borderRadius="lg" p={6}>
             <VStack spacing={4} align="stretch">
               <Flex justify="space-between" align="center">
-                <Heading size="md">Today's Habits</Heading>
+                <Heading size="md">Today&apos;s Habits</Heading>
                 <Text fontSize="sm" color="gray.500">
                   {new Date().toLocaleDateString("en-US", {
                     weekday: "long",
@@ -211,7 +215,7 @@ export default function DashboardPage() {
               ) : (
                 <VStack spacing={3} align="stretch">
                   {todayHabits.map((habit) => {
-                    const status = getHabitStatus(habit.id, new Date(), allLogs);
+                    const status = getHabitStatus(habit.id, new Date(), logsList);
                     const streakData = habitStreaks.find(
                       (s) => s.habitId === habit.id
                     );
@@ -228,7 +232,6 @@ export default function DashboardPage() {
                       />
                     );
                   })}
-                )}
                 </VStack>
               )}
             </VStack>

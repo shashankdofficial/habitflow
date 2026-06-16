@@ -46,6 +46,8 @@ export default function NewHabitPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const { createHabit, isCreating } = useHabits(user?.id);
+  const bg = useColorModeValue("gray.50", "gray.900");
+  const cardBg = useColorModeValue("white", "gray.800");
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -121,7 +123,7 @@ export default function NewHabitPage() {
   }
 
   return (
-    <Box minH="100vh" bg={useColorModeValue("gray.50", "gray.900")}>
+    <Box minH="100vh" bg={bg}>
       <Navbar />
       <Box maxW="2xl" mx="auto" px={4} py={8}>
         <VStack spacing={8} align="stretch">
@@ -135,7 +137,7 @@ export default function NewHabitPage() {
             Back to Dashboard
           </Button>
 
-          <Card bg={useColorModeValue("white", "gray.800")}>
+          <Card bg={cardBg}>
             <CardBody>
               <VStack align="stretch" spacing={6}>
                 <Box>
