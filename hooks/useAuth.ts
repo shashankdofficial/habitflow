@@ -59,6 +59,7 @@ export function useAuth() {
         setUser({
           id: firebaseUser.uid,
           email: firebaseUser.email || "",
+          photoURL: firebaseUser.photoURL || null,
           user_metadata: {
             name: firebaseUser.displayName || firebaseUser.email?.split("@")[0] || "User",
           },
@@ -93,6 +94,7 @@ export function useAuth() {
         setUser({
           id: userCredential.user.uid,
           email: userCredential.user.email || "",
+          photoURL: userCredential.user.photoURL || null,
           user_metadata: {
             name: name,
           },
