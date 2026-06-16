@@ -126,7 +126,7 @@ export default function DashboardPage() {
               {remainingTodayCount > 0 ? (
                 <>You have <span className="font-semibold text-primary dark:text-white">{remainingTodayCount}</span> habits left for today.</>
               ) : (
-                <span className="text-emerald-600 dark:text-emerald-400 font-semibold">All habits completed today! Superb! 🎉</span>
+                <span className="text-blue-600 dark:text-blue-400 font-semibold">All habits completed today! Superb! 🎉</span>
               )}
             </p>
           </div>
@@ -160,7 +160,7 @@ export default function DashboardPage() {
             </div>
             <div className="w-full bg-surface-container dark:bg-zinc-800 rounded-full h-2 mt-2 overflow-hidden">
               <div
-                className="bg-emerald-500 h-full rounded-full transition-all duration-500"
+                className="bg-blue-500 h-full rounded-full transition-all duration-500"
                 style={{ width: `${completionPercentage}%` }}
               ></div>
             </div>
@@ -192,9 +192,9 @@ export default function DashboardPage() {
                   key={idx}
                   className={`w-full h-1 rounded-full ${
                     day.rate > 75 
-                      ? "bg-emerald-500" 
+                      ? "bg-blue-500" 
                       : day.rate > 0 
-                        ? "bg-emerald-300 dark:bg-emerald-800" 
+                        ? "bg-blue-300 dark:bg-blue-800" 
                         : "bg-surface-container dark:bg-zinc-800"
                   }`}
                   title={`${day.dateStr}: ${Math.round(day.rate)}% completed`}
@@ -349,10 +349,10 @@ export default function DashboardPage() {
               <div className="grid grid-cols-7 gap-2">
                 {last7Days.map((day, idx) => {
                   let cellColor = "bg-surface-container dark:bg-zinc-800";
-                  if (day.rate > 75) cellColor = "bg-emerald-600";
-                  else if (day.rate > 50) cellColor = "bg-emerald-500/80";
-                  else if (day.rate > 25) cellColor = "bg-emerald-300 dark:bg-emerald-700/60";
-                  else if (day.rate > 0) cellColor = "bg-emerald-100 dark:bg-emerald-900/30";
+                  if (day.rate > 75) cellColor = "bg-blue-600";
+                  else if (day.rate > 50) cellColor = "bg-blue-500/80";
+                  else if (day.rate > 25) cellColor = "bg-blue-300 dark:bg-blue-700/60";
+                  else if (day.rate > 0) cellColor = "bg-blue-100 dark:bg-blue-900/30";
 
                   return (
                     <div
@@ -367,7 +367,7 @@ export default function DashboardPage() {
               </div>
               <Link
                 href="/analytics"
-                className="w-full mt-6 text-emerald-600 dark:text-emerald-400 font-semibold text-body-sm hover:underline flex items-center justify-center gap-1"
+                className="w-full mt-6 text-blue-600 dark:text-blue-400 font-semibold text-body-sm hover:underline flex items-center justify-center gap-1"
               >
                 <span>View Analytics</span>
                 <span className="material-symbols-outlined text-[18px]">arrow_forward</span>

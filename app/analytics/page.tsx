@@ -197,7 +197,7 @@ export default function AnalyticsPage() {
             </p>
             <div className="flex items-baseline gap-2">
               <span className="text-display-lg font-display text-primary dark:text-white font-bold">{habits.length}</span>
-              <span className="text-emerald-600 dark:text-emerald-400 text-label-md font-semibold">Active focus</span>
+              <span className="text-blue-600 dark:text-blue-400 text-label-md font-semibold">Active focus</span>
             </div>
           </div>
           <div className="bg-white dark:bg-zinc-900 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] border border-outline-variant/30 dark:border-zinc-800 p-6 rounded-2xl flex flex-col justify-between h-32 hover:shadow-md transition-shadow">
@@ -206,7 +206,7 @@ export default function AnalyticsPage() {
             </p>
             <div className="flex items-baseline gap-2">
               <span className="text-display-lg font-display text-primary dark:text-white font-bold">{totalCheckInsCount}</span>
-              <span className="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+              <span className="material-symbols-outlined text-blue-600 dark:text-blue-400 text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
                 trending_up
               </span>
             </div>
@@ -216,7 +216,7 @@ export default function AnalyticsPage() {
               Avg. Completion Rate
             </p>
             <div className="flex items-baseline gap-2">
-              <span className="text-display-lg font-display text-emerald-600 dark:text-emerald-400 font-bold">{avgCompletionRate}%</span>
+              <span className="text-display-lg font-display text-blue-600 dark:text-blue-400 font-bold">{avgCompletionRate}%</span>
               <span className="text-on-surface-variant dark:text-zinc-400 text-label-md font-semibold">overall rate</span>
             </div>
           </div>
@@ -252,14 +252,14 @@ export default function AnalyticsPage() {
                   <XAxis dataKey="dayName" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} />
                   <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} domain={[0, 100]} />
                   <Tooltip cursor={{ fill: 'rgba(0, 0, 0, 0.02)' }} />
-                  <Bar dataKey="completion" fill="#10B981" radius={[8, 8, 0, 0]} maxBarSize={45} />
+                  <Bar dataKey="completion" fill="#3B82F6" radius={[8, 8, 0, 0]} maxBarSize={45} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </section>
 
           {/* 30-Day Trend */}
-          <section className="lg:col-span-4 bg-emerald-50/30 dark:bg-emerald-950/10 border border-emerald-500/20 dark:border-zinc-800 p-6 md:p-8 rounded-3xl flex flex-col shadow-sm">
+          <section className="lg:col-span-4 bg-blue-50/30 dark:bg-blue-950/10 border border-blue-500/20 dark:border-zinc-800 p-6 md:p-8 rounded-3xl flex flex-col shadow-sm">
             <h2 className="font-display text-headline-md font-bold text-on-surface dark:text-white mb-1">
               30-Day Trend
             </h2>
@@ -273,7 +273,7 @@ export default function AnalyticsPage() {
                   <XAxis dataKey="date" stroke="#94a3b8" fontSize={9} tickLine={false} axisLine={false} interval={6} />
                   <YAxis stroke="#94a3b8" fontSize={9} tickLine={false} axisLine={false} domain={[0, 100]} />
                   <Tooltip />
-                  <Line type="monotone" dataKey="completion" stroke="#10B981" strokeWidth={3} dot={false} activeDot={{ r: 4 }} />
+                  <Line type="monotone" dataKey="completion" stroke="#3B82F6" strokeWidth={3} dot={false} activeDot={{ r: 4 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -284,7 +284,7 @@ export default function AnalyticsPage() {
               </div>
               <div>
                 <span className="text-[11px] text-on-surface-variant dark:text-zinc-400 font-mono uppercase tracking-wider block">Volatility</span>
-                <p className="font-bold text-emerald-600 dark:text-emerald-400 text-body-md mt-0.5">Low (2%)</p>
+                <p className="font-bold text-blue-600 dark:text-blue-400 text-body-md mt-0.5">Low (2%)</p>
               </div>
             </div>
           </section>
@@ -305,7 +305,7 @@ export default function AnalyticsPage() {
               ) : (
                 getHabitPerformanceData().map((habit) => {
                   let barColor = "bg-primary dark:bg-zinc-300";
-                  if (habit.completionRate > 75) barColor = "bg-emerald-500";
+                  if (habit.completionRate > 75) barColor = "bg-blue-500";
                   else if (habit.completionRate > 40) barColor = "bg-blue-500";
 
                   return (
@@ -317,7 +317,7 @@ export default function AnalyticsPage() {
                           </div>
                           <span className="font-semibold text-body-md text-on-surface dark:text-zinc-200">{habit.title}</span>
                         </div>
-                        <span className="font-mono text-label-caps text-emerald-600 dark:text-emerald-400 font-bold">{habit.completionRate}% Rate</span>
+                        <span className="font-mono text-label-caps text-blue-600 dark:text-blue-400 font-bold">{habit.completionRate}% Rate</span>
                       </div>
                       <div className="relative h-2 w-full bg-surface-container dark:bg-zinc-800 rounded-full overflow-hidden">
                         <div className={`absolute h-full rounded-full ${barColor}`} style={{ width: `${habit.completionRate}%` }}></div>
@@ -350,10 +350,10 @@ export default function AnalyticsPage() {
             <div className="flex flex-wrap gap-2">
               {heatmap.map((cell, idx) => {
                 let cellColor = "bg-slate-100 dark:bg-zinc-800 border border-slate-200/20";
-                if (cell.rate > 75) cellColor = "bg-emerald-600";
-                else if (cell.rate > 50) cellColor = "bg-emerald-400 dark:bg-emerald-800/60";
-                else if (cell.rate > 25) cellColor = "bg-emerald-200 dark:bg-emerald-900/40";
-                else if (cell.rate > 0) cellColor = "bg-emerald-50 dark:bg-emerald-950/20";
+                if (cell.rate > 75) cellColor = "bg-blue-600";
+                else if (cell.rate > 50) cellColor = "bg-blue-400 dark:bg-blue-800/60";
+                else if (cell.rate > 25) cellColor = "bg-blue-200 dark:bg-blue-900/40";
+                else if (cell.rate > 0) cellColor = "bg-blue-50 dark:bg-blue-950/20";
 
                 return (
                   <div
@@ -370,7 +370,7 @@ export default function AnalyticsPage() {
                 <span className="text-[11px] text-on-surface-variant dark:text-zinc-400 font-mono uppercase tracking-wider mb-1">Most Active Day</span>
                 <div className="flex items-center gap-2">
                   <span className="text-headline-md font-semibold text-on-surface dark:text-zinc-100">{maxDay}</span>
-                  <span className="bg-secondary-container dark:bg-emerald-950/80 text-on-secondary-container dark:text-emerald-300 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tight">
+                  <span className="bg-secondary-container dark:bg-blue-950/80 text-on-secondary-container dark:text-blue-300 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tight">
                     Prime Time
                   </span>
                 </div>
@@ -409,7 +409,7 @@ export default function AnalyticsPage() {
             </div>
           </div>
           {/* Abstract Graphic Background */}
-          <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-emerald-600 rounded-full blur-[100px] opacity-20"></div>
+          <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-blue-600 rounded-full blur-[100px] opacity-20"></div>
           <div className="absolute -left-20 -top-20 w-80 h-80 bg-zinc-800 rounded-full blur-[100px] opacity-10"></div>
         </section>
       </motion.div>

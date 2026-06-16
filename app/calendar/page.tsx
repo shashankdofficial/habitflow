@@ -80,10 +80,10 @@ export default function CalendarPage() {
   const getHeatmapColor = (day: Date) => {
     const { percentage, total } = getCompletionDataForDay(day);
     if (total === 0 || percentage === 0) return "bg-slate-100 dark:bg-zinc-800 text-on-surface-variant dark:text-zinc-400";
-    if (percentage < 25) return "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300";
-    if (percentage < 50) return "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300";
-    if (percentage < 100) return "bg-emerald-300 dark:bg-emerald-800/60 text-emerald-950 dark:text-emerald-200";
-    return "bg-emerald-600 text-white font-semibold";
+    if (percentage < 25) return "bg-blue-50 dark:bg-blue-950/20 text-blue-800 dark:text-blue-300";
+    if (percentage < 50) return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300";
+    if (percentage < 100) return "bg-blue-300 dark:bg-blue-800/60 text-blue-950 dark:text-blue-200";
+    return "bg-blue-600 text-white font-semibold";
   };
 
   // Helper to fetch completion indicators for the last 5 days of focus habits
@@ -213,19 +213,19 @@ export default function CalendarPage() {
                   <span className="text-label-md text-body-sm text-on-surface-variant dark:text-zinc-400">0%</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-3.5 h-3.5 rounded-sm bg-emerald-50 dark:bg-emerald-950/20"></div>
+                  <div className="w-3.5 h-3.5 rounded-sm bg-blue-50 dark:bg-blue-950/20"></div>
                   <span className="text-label-md text-body-sm text-on-surface-variant dark:text-zinc-400">1-24%</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-3.5 h-3.5 rounded-sm bg-emerald-100 dark:bg-emerald-900/30"></div>
+                  <div className="w-3.5 h-3.5 rounded-sm bg-blue-100 dark:bg-blue-900/30"></div>
                   <span className="text-label-md text-body-sm text-on-surface-variant dark:text-zinc-400">25-49%</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-3.5 h-3.5 rounded-sm bg-emerald-300 dark:bg-emerald-800/60"></div>
+                  <div className="w-3.5 h-3.5 rounded-sm bg-blue-300 dark:bg-blue-800/60"></div>
                   <span className="text-label-md text-body-sm text-on-surface-variant dark:text-zinc-400">50-99%</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-3.5 h-3.5 rounded-sm bg-emerald-600"></div>
+                  <div className="w-3.5 h-3.5 rounded-sm bg-blue-600"></div>
                   <span className="text-label-md text-body-sm text-on-surface-variant dark:text-zinc-400">Mastery (100%)</span>
                 </div>
               </div>
@@ -247,7 +247,7 @@ export default function CalendarPage() {
                   </div>
                   <div className="w-full h-2 bg-surface-container dark:bg-zinc-800 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                      className="h-full bg-blue-500 rounded-full transition-all duration-500"
                       style={{ width: `${monthCompletionRate}%` }}
                     ></div>
                   </div>
@@ -266,7 +266,7 @@ export default function CalendarPage() {
                   <div className="p-4 bg-surface-container dark:bg-zinc-800 rounded-xl flex flex-col justify-between">
                     <p className="text-label-md text-on-surface-variant dark:text-zinc-400 mb-1">Total Done</p>
                     <p className="font-display text-headline-md font-bold text-primary dark:text-white flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-emerald-600 text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                      <span className="material-symbols-outlined text-blue-600 text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>
                         task_alt
                       </span>
                       {completedMonthLogsCount}
@@ -300,7 +300,7 @@ export default function CalendarPage() {
                             {indicators.map((isDone, i) => (
                               <div
                                 key={i}
-                                className={`w-full h-1 rounded-full ${isDone ? "bg-emerald-500" : "bg-surface-container dark:bg-zinc-800"}`}
+                                className={`w-full h-1 rounded-full ${isDone ? "bg-blue-500" : "bg-surface-container dark:bg-zinc-800"}`}
                                 title={isDone ? "Completed" : "Incomplete"}
                               ></div>
                             ))}

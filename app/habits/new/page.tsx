@@ -172,7 +172,7 @@ export default function NewHabitPage() {
                   placeholder="e.g., Morning Meditation"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg border border-outline-variant dark:border-zinc-800 bg-surface dark:bg-zinc-950 text-on-surface dark:text-zinc-100 placeholder:text-on-surface-variant/50 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-lg border border-outline-variant dark:border-zinc-800 bg-surface dark:bg-zinc-950 text-on-surface dark:text-zinc-100 placeholder:text-on-surface-variant/50 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                 />
               </div>
 
@@ -186,7 +186,7 @@ export default function NewHabitPage() {
                   placeholder="Why is this habit important to you?"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg border border-outline-variant dark:border-zinc-800 bg-surface dark:bg-zinc-950 text-on-surface dark:text-zinc-100 placeholder:text-on-surface-variant/50 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none resize-none transition-all"
+                  className="w-full px-4 py-3 rounded-lg border border-outline-variant dark:border-zinc-800 bg-surface dark:bg-zinc-950 text-on-surface dark:text-zinc-100 placeholder:text-on-surface-variant/50 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none transition-all"
                 ></textarea>
               </div>
             </div>
@@ -214,7 +214,7 @@ export default function NewHabitPage() {
                         }
                       }
                     }}
-                    className="w-full appearance-none px-4 py-3 rounded-lg border border-outline-variant dark:border-zinc-800 bg-surface dark:bg-zinc-950 text-on-surface dark:text-zinc-100 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none pr-10 cursor-pointer transition-all"
+                    className="w-full appearance-none px-4 py-3 rounded-lg border border-outline-variant dark:border-zinc-800 bg-surface dark:bg-zinc-950 text-on-surface dark:text-zinc-100 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none pr-10 cursor-pointer transition-all"
                   >
                     <option value="daily">Every Day</option>
                     <option value="weekly">Weekly (Once a Week)</option>
@@ -235,7 +235,7 @@ export default function NewHabitPage() {
                   type="time"
                   value={reminderTime}
                   onChange={(e) => setReminderTime(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg border border-outline-variant dark:border-zinc-800 bg-surface dark:bg-zinc-950 text-on-surface dark:text-zinc-100 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-lg border border-outline-variant dark:border-zinc-800 bg-surface dark:bg-zinc-950 text-on-surface dark:text-zinc-100 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                 />
               </div>
             </div>
@@ -329,7 +329,7 @@ export default function NewHabitPage() {
               <button
                 type="submit"
                 disabled={isCreating}
-                className="flex-1 bg-emerald-600 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                className="flex-1 bg-blue-600 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
               >
                 <span>{isCreating ? "Creating..." : "Create Habit"}</span>
                 <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
@@ -349,7 +349,7 @@ export default function NewHabitPage() {
         {/* Bottom Motivational Cards */}
         <div className="w-full max-w-2xl mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-surface-container dark:bg-zinc-900 p-6 rounded-xl border border-outline-variant/20 dark:border-zinc-800/80 flex items-start gap-4 shadow-sm">
-            <div className="p-3 rounded-full bg-secondary-container dark:bg-emerald-950/60 text-on-secondary-container dark:text-emerald-300 shrink-0">
+            <div className="p-3 rounded-full bg-secondary-container dark:bg-blue-950/60 text-on-secondary-container dark:text-blue-300 shrink-0">
               <span className="material-symbols-outlined text-[20px]">auto_awesome</span>
             </div>
             <div>
