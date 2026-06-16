@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import toast from "react-hot-toast";
 import { useSearchStore } from "@/hooks/useSearchStore";
+import { LogoIcon, LogoFull } from "./Logo";
 
 interface NavbarProps {
   children?: React.ReactNode;
@@ -46,8 +47,9 @@ export function Navbar({ children }: NavbarProps) {
       <header className="w-full h-16 shrink-0 z-40 bg-surface dark:bg-zinc-900 shadow-sm border-b border-outline-variant/20 dark:border-zinc-800">
         <div className="flex justify-between items-center h-full px-margin-mobile md:px-margin-desktop w-full">
           <div className="flex items-center gap-8 flex-grow max-w-xl">
-            <Link href="/dashboard" className="text-headline-lg font-display text-primary dark:text-white tracking-tight hover:opacity-95 shrink-0">
-              HabitFlow
+            <Link href="/dashboard" className="hover:opacity-95 shrink-0 flex items-center text-primary dark:text-white">
+              <LogoIcon className="w-8 h-8 md:hidden" />
+              <LogoFull className="w-36 h-9 hidden md:block" />
             </Link>
             {/* Search Bar */}
             <div className="flex items-center bg-surface-container dark:bg-zinc-800 px-4 py-2 rounded-full gap-2 focus-within:ring-2 ring-primary/20 transition-all flex-grow max-w-md">
@@ -87,10 +89,7 @@ export function Navbar({ children }: NavbarProps) {
       <main className="flex flex-1 w-full overflow-hidden pb-16 md:pb-0">
         {/* SideNavBar (Visible on lg screens) */}
         <aside className="hidden lg:flex flex-col gap-base p-6 border-r border-outline-variant dark:border-zinc-800 bg-surface-container-lowest dark:bg-zinc-950 w-64 shrink-0 h-full overflow-y-auto scrollbar-hide">
-          <div className="mb-8 p-2">
-            <h2 className="font-display text-headline-md font-bold text-primary dark:text-white">HabitFlow</h2>
-            <p className="text-on-surface-variant dark:text-zinc-400 text-body-sm">Master your routine</p>
-          </div>
+          
           
           <div className="flex flex-col gap-2 flex-grow">
             {navItems.map((item) => {
