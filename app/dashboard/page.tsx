@@ -11,6 +11,7 @@ import { HabitCard } from "@/components/HabitCard";
 import Link from "next/link";
 import { subDays, format, isSameDay } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSearchStore } from "@/hooks/useSearchStore";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -72,10 +73,15 @@ export default function DashboardPage() {
     ? Math.max(...habitStreaks.map(s => s.longestStreak)) 
     : 0;
 
-  // Filter habits based on Frequency
+  // Filter habits based on Frequency and Search Query
+  const { searchQuery } = useSearchStore();
+
   const filteredHabits = todayHabits.filter((habit) => {
-    if (activeFilter === "all") return true;
-    return habit.frequency === activeFilter;
+    const matchesFrequency = activeFilter === "all" || habit.frequency === activeFilter;
+    const matchesSearch = !searchQuery || 
+      habit.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      !!(habit.description && habit.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesFrequency && matchesSearch;
   });
 
   // Calculate Last 7 Days Activity

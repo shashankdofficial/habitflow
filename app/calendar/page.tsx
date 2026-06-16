@@ -10,12 +10,23 @@ import { Navbar } from "@/components/Navbar";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, subMonths, addMonths, subDays } from "date-fns";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useSearchStore } from "@/hooks/useSearchStore";
 
 export default function CalendarPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const { habits, isLoading } = useHabits(user?.id);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const { searchQuery } = useSearchStore();
+
+  const filteredFocusHabits = habits.filter((habit) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      habit.title.toLowerCase().includes(query) ||
+      !!(habit.description && habit.description.toLowerCase().includes(query))
+    );
+  });
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -282,11 +293,11 @@ export default function CalendarPage() {
                 Focus Habits
               </h3>
               
-              {habits.length === 0 ? (
+              {filteredFocusHabits.length === 0 ? (
                 <p className="text-body-sm text-on-surface-variant dark:text-zinc-400 py-4">No active habits. Create one to begin!</p>
               ) : (
                 <div className="space-y-4">
-                  {habits.slice(0, 4).map((habit) => {
+                  {filteredFocusHabits.slice(0, 4).map((habit) => {
                     const indicators = getRecentCompletionIndicators(habit.id);
                     return (
                       <div key={habit.id} className="flex items-center gap-3 p-3 rounded-xl border border-outline-variant/30 dark:border-zinc-800">

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import toast from "react-hot-toast";
+import { useSearchStore } from "@/hooks/useSearchStore";
 
 interface NavbarProps {
   children?: React.ReactNode;
@@ -13,6 +14,7 @@ export function Navbar({ children }: NavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, signOut } = useAuth();
+  const { searchQuery, setSearchQuery } = useSearchStore();
 
   const handleSignOut = async () => {
     try {
@@ -43,42 +45,24 @@ export function Navbar({ children }: NavbarProps) {
       {/* TopAppBar Component */}
       <header className="w-full h-16 shrink-0 z-40 bg-surface dark:bg-zinc-900 shadow-sm border-b border-outline-variant/20 dark:border-zinc-800">
         <div className="flex justify-between items-center h-full px-margin-mobile md:px-margin-desktop w-full">
-          <div className="flex items-center gap-8">
-            <Link href="/dashboard" className="text-headline-lg font-display text-primary dark:text-white tracking-tight hover:opacity-95">
+          <div className="flex items-center gap-8 flex-grow max-w-xl">
+            <Link href="/dashboard" className="text-headline-lg font-display text-primary dark:text-white tracking-tight hover:opacity-95 shrink-0">
               HabitFlow
             </Link>
-            {/* Desktop Top Nav */}
-            <nav className="hidden md:flex items-center gap-6">
-              {navItems.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`font-medium px-3 py-1.5 rounded-lg transition-all text-body-md ${
-                      isActive
-                        ? "text-primary dark:text-white border-b-2 border-primary dark:border-white rounded-none"
-                        : "text-on-surface-variant dark:text-zinc-400 hover:bg-surface-container-low dark:hover:bg-zinc-800"
-                    }`}
-                  >
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-4">
             {/* Search Bar */}
-            <div className="hidden sm:flex items-center bg-surface-container dark:bg-zinc-800 px-4 py-2 rounded-full gap-2 focus-within:ring-2 ring-primary/20 transition-all">
+            <div className="flex items-center bg-surface-container dark:bg-zinc-800 px-4 py-2 rounded-full gap-2 focus-within:ring-2 ring-primary/20 transition-all flex-grow max-w-md">
               <span className="material-symbols-outlined text-on-surface-variant dark:text-zinc-400 text-[20px]">search</span>
               <input
                 type="text"
                 placeholder="Search habits..."
-                className="bg-transparent border-none focus:ring-0 text-body-sm w-48 outline-none text-on-surface dark:text-zinc-100"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="bg-transparent border-none focus:ring-0 text-body-sm w-full outline-none text-on-surface dark:text-zinc-100"
               />
             </div>
-            
+          </div>
+
+          <div className="flex items-center gap-4">
             <button className="material-symbols-outlined p-2 text-on-surface-variant dark:text-zinc-400 hover:bg-surface-container-low dark:hover:bg-zinc-800 rounded-full transition-colors">
               notifications
             </button>
@@ -117,7 +101,7 @@ export function Navbar({ children }: NavbarProps) {
                   href={item.href}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                     isActive
-                      ? "bg-secondary-container dark:bg-zinc-800 text-on-secondary-container dark:text-white font-semibold active:scale-95 shadow-sm"
+                      ? "bg-blue-100 dark:bg-zinc-800 text-blue-900 dark:text-white font-semibold active:scale-95 shadow-sm"
                       : "text-on-surface-variant dark:text-zinc-400 hover:bg-surface-container dark:hover:bg-zinc-900 hover:translate-x-1"
                   }`}
                 >

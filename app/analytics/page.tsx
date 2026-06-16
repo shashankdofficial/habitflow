@@ -7,6 +7,7 @@ import { useHabits } from "@/hooks/useHabits";
 import { useQuery } from "@tanstack/react-query";
 import { getHabitLogs, calculateStreak } from "@/lib/habits";
 import { Navbar } from "@/components/Navbar";
+import { useSearchStore } from "@/hooks/useSearchStore";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { subDays, format, isSameDay, eachDayOfInterval } from "date-fns";
 import { motion } from "framer-motion";
@@ -16,6 +17,7 @@ export default function AnalyticsPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const { habits, isLoading } = useHabits(user?.id);
+  const { searchQuery } = useSearchStore();
 
   const { data: allLogs = [] } = useQuery({
     queryKey: ["allHabitLogs", user?.id],
@@ -86,16 +88,28 @@ export default function AnalyticsPage() {
     });
   };
 
+  // Calculation for Habit Performance List
   const getHabitPerformanceData = () => {
-    return habits.map((habit) => {
-      const habitLogs = allLogs.filter((log) => log.habit_id === habit.id);
+    const filtered = habits.filter((habit) => {
+      if (!searchQuery) return true;
+      const query = searchQuery.toLowerCase();
+      return (
+        habit.title.toLowerCase().includes(query) ||
+        !!(habit.description && habit.description.toLowerCase().includes(query))
+      );
+    });
+
+    return filtered.map((habit) => {
+      const habitLogs = allLogs.filter((l) => l.habit_id === habit.id);
+      const completedCount = habitLogs.filter((l) => l.status === "completed").length;
+      const totalDays = habitLogs.length || 1;
+      const completionRate = Math.round((completedCount / totalDays) * 100);
+
       const streakData = calculateStreak(habitLogs);
+
       return {
-        id: habit.id,
-        title: habit.title,
-        icon: habit.icon,
-        color: habit.color,
-        completionRate: streakData.completionPercentage,
+        ...habit,
+        completionRate,
         currentStreak: streakData.currentStreak,
       };
     });
@@ -246,7 +260,7 @@ export default function AnalyticsPage() {
               </div>
             </div>
             {/* Recharts BarChart */}
-            <div className="flex-grow min-h-[300px] w-full pt-4">
+            <div className="relative h-[300px] w-full pt-4">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={getWeeklyCompletionData()} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <XAxis dataKey="dayName" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} />
@@ -267,7 +281,7 @@ export default function AnalyticsPage() {
               Long-term consistency metric
             </p>
             {/* Recharts LineChart */}
-            <div className="flex-grow min-h-[200px] w-full">
+            <div className="relative h-[200px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={getDailyCompletionData()} margin={{ top: 10, right: 5, left: -25, bottom: 0 }}>
                   <XAxis dataKey="date" stroke="#94a3b8" fontSize={9} tickLine={false} axisLine={false} interval={6} />
@@ -370,7 +384,7 @@ export default function AnalyticsPage() {
                 <span className="text-[11px] text-on-surface-variant dark:text-zinc-400 font-mono uppercase tracking-wider mb-1">Most Active Day</span>
                 <div className="flex items-center gap-2">
                   <span className="text-headline-md font-semibold text-on-surface dark:text-zinc-100">{maxDay}</span>
-                  <span className="bg-secondary-container dark:bg-blue-950/80 text-on-secondary-container dark:text-blue-300 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tight">
+                  <span className="bg-blue-100 dark:bg-blue-950/80 text-blue-900 dark:text-blue-300 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tight">
                     Prime Time
                   </span>
                 </div>

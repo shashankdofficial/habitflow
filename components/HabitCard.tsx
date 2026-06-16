@@ -147,8 +147,8 @@ export function HabitCard({ habit, status, streak, onToggle }: HabitCardProps) {
         onClick={handleToggle}
         className={`w-12 h-12 rounded-full flex items-center justify-center transition-all border-2 active:scale-90 ${
           isCompleted
-            ? "bg-secondary-container dark:bg-blue-950/80 border-transparent text-on-secondary-container dark:text-blue-300"
-            : "border-outline-variant dark:border-zinc-700 text-transparent hover:border-secondary dark:hover:border-blue-500"
+            ? "bg-blue-100 dark:bg-blue-950/80 border-transparent text-blue-900 dark:text-blue-300"
+            : "border-outline-variant dark:border-zinc-700 text-transparent hover:border-blue-600 dark:hover:border-blue-500"
         }`}
       >
         <span className="material-symbols-outlined font-bold text-[22px]" style={{ fontVariationSettings: isCompleted ? "'FILL' 1" : undefined }}>

@@ -349,7 +349,7 @@ export default function NewHabitPage() {
         {/* Bottom Motivational Cards */}
         <div className="w-full max-w-2xl mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-surface-container dark:bg-zinc-900 p-6 rounded-xl border border-outline-variant/20 dark:border-zinc-800/80 flex items-start gap-4 shadow-sm">
-            <div className="p-3 rounded-full bg-secondary-container dark:bg-blue-950/60 text-on-secondary-container dark:text-blue-300 shrink-0">
+            <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-900 dark:text-blue-300 shrink-0">
               <span className="material-symbols-outlined text-[20px]">auto_awesome</span>
             </div>
             <div>
