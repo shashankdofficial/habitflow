@@ -20,6 +20,11 @@ export function Navbar() {
   const { user, signOut } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const bg = useColorModeValue("white", "gray.800");
+  const activeLinkColor = "blue.500";
+  const inactiveLinkColor = useColorModeValue("gray.600", "gray.300");
+  const activeLinkBg = useColorModeValue("blue.50", "blue.900");
+  const hoverLinkBg = useColorModeValue("gray.100", "gray.700");
+  const borderColor = useColorModeValue("gray.200", "gray.700");
 
   const navItems = [
     { label: "Dashboard", icon: Home, href: "/dashboard" },
@@ -40,7 +45,7 @@ export function Navbar() {
   if (!user) return null;
 
   return (
-    <Box bg={bg} borderBottom="1px" borderColor="gray.200" position="sticky" top={0} zIndex={10}>
+    <Box bg={bg} borderBottom="1px" borderColor={borderColor} position="sticky" top={0} zIndex={10}>
       <Flex maxW="7xl" mx="auto" px={4} h={16} align="center" justify="space-between">
         <Flex align="center" gap={8}>
           <Link href="/dashboard">
@@ -62,11 +67,11 @@ export function Navbar() {
                     px={3}
                     py={2}
                     borderRadius="md"
-                    color={isActive ? "blue.500" : "gray.600"}
-                    bg={isActive ? "blue.50" : "transparent"}
+                    color={isActive ? activeLinkColor : inactiveLinkColor}
+                    bg={isActive ? activeLinkBg : "transparent"}
                     transition="all"
                     _hover={{
-                      bg: isActive ? "blue.50" : "gray.100",
+                      bg: isActive ? activeLinkBg : hoverLinkBg,
                     }}
                   >
                     <Icon size={18} />
@@ -101,7 +106,7 @@ export function Navbar() {
       </Flex>
 
       {/* Mobile Menu */}
-      <Box display={{ base: isOpen ? "block" : "none", md: "none" }} borderBottom="1px" borderColor="gray.200">
+      <Box display={{ base: isOpen ? "block" : "none", md: "none" }} borderBottom="1px" borderColor={borderColor}>
         <VStack spacing={2} py={4} align="stretch">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -114,8 +119,8 @@ export function Navbar() {
                   gap={3}
                   px={4}
                   py={3}
-                  color={isActive ? "blue.500" : "gray.600"}
-                  bg={isActive ? "blue.50" : "transparent"}
+                  color={isActive ? activeLinkColor : inactiveLinkColor}
+                  bg={isActive ? activeLinkBg : "transparent"}
                   onClick={onClose}
                 >
                   <Icon size={18} />
@@ -125,7 +130,7 @@ export function Navbar() {
             );
           })}
 
-          <Flex align="center" gap={3} px={4} py={3} color="gray.600" onClick={() => { handleSignOut(); onClose(); }} cursor="pointer">
+          <Flex align="center" gap={3} px={4} py={3} color={inactiveLinkColor} onClick={() => { handleSignOut(); onClose(); }} cursor="pointer">
             <LogOut size={18} />
             <Text fontWeight="medium">Sign Out</Text>
           </Flex>

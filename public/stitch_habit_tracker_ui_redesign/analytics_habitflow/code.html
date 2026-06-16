@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HabitFlow | Analytics Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@600;700;800&family=JetBrains+Mono:wght@500&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#bec6e0",
+                        "inverse-primary": "#bec6e0",
+                        "surface-container-high": "#dce9ff",
+                        "tertiary-container": "#001a42",
+                        "tertiary": "#000000",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#0b1c30",
+                        "primary": "#000000",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#7c839b",
+                        "surface-container-low": "#eff4ff",
+                        "tertiary-fixed": "#d8e2ff",
+                        "surface": "#f8f9ff",
+                        "outline": "#76777d",
+                        "surface-tint": "#565e74",
+                        "secondary-container": "#6cf8bb",
+                        "error": "#ba1a1a",
+                        "primary-container": "#131b2e",
+                        "on-primary-fixed": "#131b2e",
+                        "on-surface": "#0b1c30",
+                        "on-tertiary-fixed": "#001a42",
+                        "outline-variant": "#c6c6cd",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-secondary-fixed": "#002113",
+                        "on-surface-variant": "#45464d",
+                        "background": "#f8f9ff",
+                        "secondary-fixed-dim": "#4edea3",
+                        "inverse-surface": "#213145",
+                        "on-tertiary-container": "#3980f4",
+                        "surface-dim": "#cbdbf5",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#6ffbbe",
+                        "inverse-on-surface": "#eaf1ff",
+                        "secondary": "#006c49",
+                        "tertiary-fixed-dim": "#adc6ff",
+                        "on-tertiary-fixed-variant": "#004395",
+                        "on-secondary-container": "#00714d",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#005236",
+                        "surface-container": "#e5eeff",
+                        "surface-bright": "#f8f9ff",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#d3e4fe",
+                        "primary-fixed": "#dae2fd",
+                        "error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "container-max": "1200px",
+                        "section-gap": "48px",
+                        "margin-desktop": "40px",
+                        "gutter": "24px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .chart-bar-hover:hover {
+            filter: brightness(1.1);
+            transform: scaleY(1.02);
+            transition: all 0.2s ease;
+        }
+        .bento-card {
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.3s ease;
+        }
+        .bento-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md">
+<!-- Top Navigation -->
+<header class="w-full sticky top-0 z-40 bg-surface shadow-sm">
+<div class="flex justify-between items-center h-16 px-margin-desktop w-full max-w-container-max mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-headline-lg font-headline-lg text-primary tracking-tight">HabitFlow</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-on-surface-variant hover:bg-surface-container-low transition-colors px-3 py-1 rounded-lg font-body-md" href="#">Dashboard</a>
+<a class="text-on-surface-variant hover:bg-surface-container-low transition-colors px-3 py-1 rounded-lg font-body-md" href="#">Calendar</a>
+<a class="text-primary font-bold border-b-2 border-primary px-3 py-1 font-body-md" href="#">Analytics</a>
+<a class="text-on-surface-variant hover:bg-surface-container-low transition-colors px-3 py-1 rounded-lg font-body-md" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors" data-icon="settings">settings</button>
+<div class="h-8 w-8 rounded-full bg-surface-container overflow-hidden border border-outline-variant">
+<img alt="User profile photo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjoazBjKhn9htzwDwbfLOOWWY_FA3YNRnNpi61IMBPXa-Vp5nrj5u5ysMeoj0nd57DZeVd4mUDKVs9GdELJgpuYK42g6FuKfgyH0PSgzawoiSk5kHRVxaDb6AWT9ur3-4GUUK-A8LCcq7lbyevePR46cO1vdmKwHJm_c4ENph9sSIA9FGtJdmCq6upyML1sO89XsEztA34txURPwhPiVFGwnZerXXEUD_ilipj2FYKZ8LaeOPKgF91VWUxsQAIGSmhf9H2_7zVd0vw"/>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-margin-desktop py-10 space-y-section-gap">
+<!-- Header Section -->
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Analytics Dashboard</h1>
+<p class="text-on-surface-variant font-body-md mt-1">Track your progress and mastery over time. 📊</p>
+</div>
+<button class="bg-primary text-on-primary px-6 py-2.5 rounded-xl font-body-md font-semibold active:scale-95 duration-150 hover:bg-opacity-90 flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+                Create Habit
+            </button>
+</section>
+<!-- High-Level Metrics Bento -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<div class="bento-card p-6 rounded-2xl border border-outline-variant/30">
+<p class="text-on-surface-variant font-label-md uppercase tracking-wider mb-2">Total Habits</p>
+<div class="flex items-baseline gap-2">
+<span class="text-display-lg font-display-lg text-primary">12</span>
+<span class="text-secondary font-label-md">+2 this month</span>
+</div>
+</div>
+<div class="bento-card p-6 rounded-2xl border border-outline-variant/30">
+<p class="text-on-surface-variant font-label-md uppercase tracking-wider mb-2">Total Check-ins</p>
+<div class="flex items-baseline gap-2">
+<span class="text-display-lg font-display-lg text-primary">348</span>
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="trending_up">trending_up</span>
+</div>
+</div>
+<div class="bento-card p-6 rounded-2xl border border-outline-variant/30">
+<p class="text-on-surface-variant font-label-md uppercase tracking-wider mb-2">Avg. Completion Rate</p>
+<div class="flex items-baseline gap-2">
+<span class="text-display-lg font-display-lg text-secondary">84%</span>
+<span class="text-on-surface-variant font-label-md">vs 78% last week</span>
+</div>
+</div>
+<div class="bento-card p-6 rounded-2xl border border-outline-variant/30 bg-primary-container">
+<p class="text-on-primary-container font-label-md uppercase tracking-wider mb-2">Longest Streak</p>
+<div class="flex items-baseline gap-2">
+<span class="text-display-lg font-display-lg text-on-primary">24</span>
+<span class="text-on-primary-container font-label-md">Days (Running)</span>
+</div>
+</div>
+</section>
+<!-- Main Analytics Area -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Weekly Progress - 8 Columns -->
+<section class="lg:col-span-8 bento-card p-8 rounded-3xl flex flex-col h-full">
+<div class="flex justify-between items-start mb-8">
+<div>
+<h2 class="font-headline-md text-headline-md">Weekly Completion Rate</h2>
+<p class="text-on-surface-variant text-body-sm">Visualizing consistency over the last 7 days</p>
+</div>
+<div class="flex bg-surface-container-low rounded-lg p-1">
+<button class="px-3 py-1 text-label-md font-semibold bg-white shadow-sm rounded-md">Weekly</button>
+<button class="px-3 py-1 text-label-md font-semibold text-on-surface-variant">Monthly</button>
+</div>
+</div>
+<div class="flex-grow flex items-end justify-between gap-4 pt-10 min-h-[300px]">
+<!-- Chart Bars -->
+<div class="flex flex-col items-center gap-3 w-full group">
+<div class="relative w-full bg-surface-container-highest rounded-t-xl overflow-hidden chart-bar-hover" style="height: 60%;">
+<div class="absolute bottom-0 w-full bg-secondary" style="height: 100%;"></div>
+</div>
+<span class="text-label-caps text-on-surface-variant">Mon</span>
+</div>
+<div class="flex flex-col items-center gap-3 w-full">
+<div class="relative w-full bg-surface-container-highest rounded-t-xl overflow-hidden chart-bar-hover" style="height: 85%;">
+<div class="absolute bottom-0 w-full bg-secondary" style="height: 100%;"></div>
+</div>
+<span class="text-label-caps text-on-surface-variant">Tue</span>
+</div>
+<div class="flex flex-col items-center gap-3 w-full">
+<div class="relative w-full bg-surface-container-highest rounded-t-xl overflow-hidden chart-bar-hover" style="height: 40%;">
+<div class="absolute bottom-0 w-full bg-secondary" style="height: 100%;"></div>
+</div>
+<span class="text-label-caps text-on-surface-variant">Wed</span>
+</div>
+<div class="flex flex-col items-center gap-3 w-full">
+<div class="relative w-full bg-surface-container-highest rounded-t-xl overflow-hidden chart-bar-hover" style="height: 95%;">
+<div class="absolute bottom-0 w-full bg-secondary" style="height: 100%;"></div>
+</div>
+<span class="text-label-caps text-on-surface-variant">Thu</span>
+</div>
+<div class="flex flex-col items-center gap-3 w-full">
+<div class="relative w-full bg-surface-container-highest rounded-t-xl overflow-hidden chart-bar-hover" style="height: 70%;">
+<div class="absolute bottom-0 w-full bg-secondary" style="height: 100%;"></div>
+</div>
+<span class="text-label-caps text-on-surface-variant">Fri</span>
+</div>
+<div class="flex flex-col items-center gap-3 w-full">
+<div class="relative w-full bg-surface-container-highest rounded-t-xl overflow-hidden chart-bar-hover" style="height: 30%;">
+<div class="absolute bottom-0 w-full bg-secondary" style="height: 100%;"></div>
+</div>
+<span class="text-label-caps text-on-surface-variant">Sat</span>
+</div>
+<div class="flex flex-col items-center gap-3 w-full">
+<div class="relative w-full bg-surface-container-highest rounded-t-xl overflow-hidden chart-bar-hover" style="height: 10%;">
+<div class="absolute bottom-0 w-full bg-secondary" style="height: 100%;"></div>
+</div>
+<span class="text-label-caps text-on-surface-variant">Sun</span>
+</div>
+</div>
+</section>
+<!-- 30-Day Trend - 4 Columns -->
+<section class="lg:col-span-4 bento-card p-8 rounded-3xl bg-secondary-container/20 flex flex-col">
+<h2 class="font-headline-md text-headline-md mb-2">30-Day Trend</h2>
+<p class="text-on-surface-variant text-body-sm mb-6">Long-term consistency metric</p>
+<div class="flex-grow flex items-center justify-center relative">
+<!-- SVG Trend Line Placeholder -->
+<svg class="w-full h-full overflow-visible drop-shadow-lg" viewbox="0 0 200 100">
+<path class="text-secondary" d="M0,80 Q20,70 40,75 T80,50 T120,60 T160,20 T200,30" fill="none" stroke="currentColor" stroke-width="4"></path>
+<circle class="text-secondary" cx="200" cy="30" fill="white" r="4" stroke="currentColor" stroke-width="2"></circle>
+<rect class="opacity-80" fill="black" height="20" rx="4" width="40" x="180" y="0"></rect>
+<text class="font-body-sm" fill="white" font-size="10" x="185" y="14">92%</text>
+</svg>
+</div>
+<div class="mt-8 pt-6 border-t border-outline-variant/30 grid grid-cols-2 gap-4">
+<div>
+<span class="text-label-md text-on-surface-variant uppercase">Peak Day</span>
+<p class="font-bold text-on-surface">Jun 14</p>
+</div>
+<div>
+<span class="text-label-md text-on-surface-variant uppercase">Volatility</span>
+<p class="font-bold text-on-surface text-secondary-fixed-dim">Low (2%)</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Detailed Breakdown Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+<!-- Habit Performance List -->
+<section class="bento-card p-8 rounded-3xl">
+<div class="flex items-center justify-between mb-8">
+<h2 class="font-headline-md text-headline-md">Habit Performance</h2>
+<button class="text-secondary font-semibold text-body-sm hover:underline">View All</button>
+</div>
+<div class="space-y-8">
+<!-- Habit Row 1 -->
+<div class="space-y-3">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-surface-container rounded-lg">
+<span class="material-symbols-outlined text-primary" data-icon="water_drop">water_drop</span>
+</div>
+<span class="font-headline-md">Hydration</span>
+</div>
+<span class="font-label-caps text-secondary">94% Rate</span>
+</div>
+<div class="relative h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="absolute h-full bg-secondary rounded-full" style="width: 94%"></div>
+</div>
+<div class="flex justify-between items-center text-label-md text-on-surface-variant">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+                                12 day streak
+                            </div>
+<span>Goal: 2000ml</span>
+</div>
+</div>
+<!-- Habit Row 2 -->
+<div class="space-y-3">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-surface-container rounded-lg">
+<span class="material-symbols-outlined text-primary" data-icon="fitness_center">fitness_center</span>
+</div>
+<span class="font-headline-md">Weightlifting</span>
+</div>
+<span class="font-label-caps text-on-surface-variant">68% Rate</span>
+</div>
+<div class="relative h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="absolute h-full bg-primary rounded-full" style="width: 68%"></div>
+</div>
+<div class="flex justify-between items-center text-label-md text-on-surface-variant">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+                                3 day streak
+                            </div>
+<span>Goal: 45 min</span>
+</div>
+</div>
+<!-- Habit Row 3 -->
+<div class="space-y-3">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-surface-container rounded-lg">
+<span class="material-symbols-outlined text-primary" data-icon="menu_book">menu_book</span>
+</div>
+<span class="font-headline-md">Deep Reading</span>
+</div>
+<span class="font-label-caps text-secondary">100% Rate</span>
+</div>
+<div class="relative h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="absolute h-full bg-secondary-fixed-dim rounded-full" style="width: 100%"></div>
+</div>
+<div class="flex justify-between items-center text-label-md text-on-surface-variant">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+                                24 day streak
+                            </div>
+<span>Goal: 20 pages</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Best Performing Days (Heatmap Style) -->
+<section class="bento-card p-8 rounded-3xl">
+<h2 class="font-headline-md text-headline-md mb-2">Consistency Heatmap</h2>
+<p class="text-on-surface-variant text-body-sm mb-8">Activity frequency across the last 12 weeks</p>
+<div class="flex flex-wrap gap-2">
+<!-- Generating a grid of heatmap squares -->
+<script>
+                        const heatmapContainer = document.currentScript.parentElement;
+                        const colors = ['#F1F5F9', '#DCFCE7', '#BBF7D0', '#4ADE80', '#10B981'];
+                        for (let i = 0; i < 84; i++) {
+                            const intensity = Math.floor(Math.random() * 5);
+                            const square = document.createElement('div');
+                            square.className = 'w-6 h-6 rounded-md transition-all duration-300 hover:scale-125 hover:z-10 cursor-pointer border border-white/20';
+                            square.style.backgroundColor = colors[intensity];
+                            heatmapContainer.appendChild(square);
+                        }
+                    </script>
+</div>
+<div class="mt-10 flex items-center gap-6">
+<div class="flex flex-col">
+<span class="text-label-caps text-on-surface-variant mb-1">Most Active Day</span>
+<div class="flex items-center gap-2">
+<span class="text-headline-md">Tuesday</span>
+<span class="bg-secondary-container text-on-secondary-container text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tight">Prime Time</span>
+</div>
+</div>
+<div class="h-10 w-[1px] bg-outline-variant"></div>
+<div class="flex flex-col">
+<span class="text-label-caps text-on-surface-variant mb-1">Least Active Day</span>
+<span class="text-headline-md">Sunday</span>
+</div>
+</div>
+</section>
+</div>
+<!-- Featured Insight Card -->
+<section class="relative overflow-hidden bento-card p-10 rounded-3xl bg-primary text-on-primary">
+<div class="relative z-10 max-w-2xl">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full text-label-md font-semibold mb-4 backdrop-blur-sm">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+                    AI Insight
+                </div>
+<h3 class="font-headline-lg text-headline-lg mb-4">You're most consistent when you start before 8:00 AM.</h3>
+<p class="text-primary-fixed-dim text-body-lg mb-8">Your data shows that habits completed in the morning window have a 92% completion rate, compared to 64% after work. Try shifting your 'Deep Reading' to the morning for optimal results.</p>
+<div class="flex gap-4">
+<button class="bg-white text-primary px-6 py-2.5 rounded-xl font-semibold hover:bg-surface-container transition-colors">Apply Morning Schedule</button>
+<button class="border border-white/30 text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-white/10 transition-colors">Learn More</button>
+</div>
+</div>
+<!-- Abstract Graphic Background -->
+<div class="absolute -right-20 -bottom-20 w-80 h-80 bg-secondary rounded-full blur-[100px] opacity-30"></div>
+<div class="absolute -left-20 -top-20 w-80 h-80 bg-tertiary-fixed rounded-full blur-[100px] opacity-10"></div>
+</section>
+</main>
+<!-- Success Toast - Hidden by default, triggered by JS -->
+<div class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-[#ECFDF5] border border-[#10B981]/20 text-[#065F46] px-6 py-4 rounded-2xl shadow-xl flex items-center gap-3 transform translate-y-32 transition-transform duration-500 z-50" id="completion-toast">
+<span class="material-symbols-outlined text-[#10B981]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div class="flex flex-col">
+<span class="font-bold text-body-md">Goal Reached!</span>
+<span class="text-body-sm opacity-80">You've hit your daily hydration target.</span>
+</div>
+</div>
+<script>
+        // Micro-interaction: Randomly show toast to demonstrate the feedback mechanism
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const toast = document.getElementById('completion-toast');
+                toast.classList.remove('translate-y-32');
+                toast.classList.add('translate-y-0');
+                
+                setTimeout(() => {
+                    toast.classList.remove('translate-y-0');
+                    toast.classList.add('translate-y-32');
+                }, 4000);
+            }, 2000);
+        });
+
+        // Hover effect for charts to show detailed tooltip logic (simplified for UI demo)
+        document.querySelectorAll('.chart-bar-hover').forEach(bar => {
+            bar.addEventListener('mouseenter', () => {
+                bar.style.filter = 'brightness(1.1)';
+            });
+            bar.addEventListener('mouseleave', () => {
+                bar.style.filter = 'none';
+            });
+        });
+    </script>
+</body></html>

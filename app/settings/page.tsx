@@ -21,6 +21,7 @@ import {
   Input,
   Switch,
   Divider,
+  useColorMode,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { LogOut, User as UserIcon, Bell, Shield, Moon } from "lucide-react";
@@ -31,11 +32,16 @@ export default function SettingsPage() {
   const { user, loading: authLoading, signOut } = useAuth();
   const bg = useColorModeValue("gray.50", "gray.900");
   const cardBg = useColorModeValue("white", "gray.800");
+  const { colorMode, toggleColorMode } = useColorMode();
+  const textColor = useColorModeValue("gray.800", "white");
+  const secTextColor = useColorModeValue("gray.600", "gray.400");
+  const dividerColor = useColorModeValue("gray.200", "gray.700");
+  const iconBg = useColorModeValue("blue.100", "blue.900");
+  const iconColor = useColorModeValue("blue.600", "blue.200");
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -103,24 +109,24 @@ export default function SettingsPage() {
                     w="20"
                     h="20"
                     borderRadius="full"
-                    bg="blue.100"
+                    bg={iconBg}
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
-                    color="blue.600"
+                    color={iconColor}
                   >
                     <UserIcon size={40} />
                   </Box>
                   <VStack align="start" spacing={1}>
-                    <Heading size="lg">{name || "User"}</Heading>
-                    <Text color="gray.600">{email}</Text>
+                    <Heading size="lg" color={textColor}>{name || "User"}</Heading>
+                    <Text color={secTextColor}>{email}</Text>
                     <Text fontSize="sm" color="gray.500">
                       Member since {new Date(user.created_at || Date.now()).toLocaleDateString()}
                     </Text>
                   </VStack>
                 </Flex>
 
-                <Divider />
+                <Divider borderColor={dividerColor} />
 
                 <VStack align="stretch" spacing={4}>
                   <Heading size="md" display="flex" alignItems="center" gap={2}>
@@ -159,8 +165,8 @@ export default function SettingsPage() {
 
                 <HStack justify="space-between">
                   <Box>
-                    <Text fontWeight="medium">Email Notifications</Text>
-                    <Text fontSize="sm" color="gray.600">
+                    <Text fontWeight="medium" color={textColor}>Email Notifications</Text>
+                    <Text fontSize="sm" color={secTextColor}>
                       Receive daily reminders and progress updates
                     </Text>
                   </Box>
@@ -172,8 +178,8 @@ export default function SettingsPage() {
 
                 <HStack justify="space-between">
                   <Box>
-                    <Text fontWeight="medium">Push Notifications</Text>
-                    <Text fontSize="sm" color="gray.600">
+                    <Text fontWeight="medium" color={textColor}>Push Notifications</Text>
+                    <Text fontSize="sm" color={secTextColor}>
                       Get notified when it&apos;s time to complete habits
                     </Text>
                   </Box>
@@ -196,14 +202,14 @@ export default function SettingsPage() {
 
                 <HStack justify="space-between">
                   <Box>
-                    <Text fontWeight="medium">Dark Mode</Text>
-                    <Text fontSize="sm" color="gray.600">
+                    <Text fontWeight="medium" color={textColor}>Dark Mode</Text>
+                    <Text fontSize="sm" color={secTextColor}>
                       Switch between light and dark themes
                     </Text>
                   </Box>
                   <Switch
-                    isChecked={darkMode}
-                    onChange={(e) => setDarkMode(e.target.checked)}
+                    isChecked={colorMode === "dark"}
+                    onChange={toggleColorMode}
                   />
                 </HStack>
               </VStack>
@@ -220,8 +226,8 @@ export default function SettingsPage() {
 
                 <HStack justify="space-between">
                   <Box>
-                    <Text fontWeight="medium">Change Password</Text>
-                    <Text fontSize="sm" color="gray.600">
+                    <Text fontWeight="medium" color={textColor}>Change Password</Text>
+                    <Text fontSize="sm" color={secTextColor}>
                       Update your password regularly for security
                     </Text>
                   </Box>
@@ -230,7 +236,7 @@ export default function SettingsPage() {
                   </Button>
                 </HStack>
 
-                <Divider />
+                <Divider borderColor={dividerColor} />
 
                 <Button
                   colorScheme="red"

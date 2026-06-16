@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HabitFlow - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Hanken+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary-fixed-dim": "#bec6e0",
+            "inverse-primary": "#bec6e0",
+            "surface-container-high": "#dce9ff",
+            "tertiary-container": "#001a42",
+            "tertiary": "#000000",
+            "on-secondary": "#ffffff",
+            "on-background": "#0b1c30",
+            "primary": "#000000",
+            "on-primary-fixed-variant": "#3f465c",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#7c839b",
+            "surface-container-low": "#eff4ff",
+            "tertiary-fixed": "#d8e2ff",
+            "surface": "#f8f9ff",
+            "outline": "#76777d",
+            "surface-tint": "#565e74",
+            "secondary-container": "#6cf8bb",
+            "error": "#ba1a1a",
+            "primary-container": "#131b2e",
+            "on-primary-fixed": "#131b2e",
+            "on-surface": "#0b1c30",
+            "on-tertiary-fixed": "#001a42",
+            "outline-variant": "#c6c6cd",
+            "surface-container-highest": "#d3e4fe",
+            "on-secondary-fixed": "#002113",
+            "on-surface-variant": "#45464d",
+            "background": "#f8f9ff",
+            "secondary-fixed-dim": "#4edea3",
+            "inverse-surface": "#213145",
+            "on-tertiary-container": "#3980f4",
+            "surface-dim": "#cbdbf5",
+            "on-tertiary": "#ffffff",
+            "secondary-fixed": "#6ffbbe",
+            "inverse-on-surface": "#eaf1ff",
+            "secondary": "#006c49",
+            "tertiary-fixed-dim": "#adc6ff",
+            "on-tertiary-fixed-variant": "#004395",
+            "on-secondary-container": "#00714d",
+            "surface-container-lowest": "#ffffff",
+            "on-secondary-fixed-variant": "#005236",
+            "surface-container": "#e5eeff",
+            "surface-bright": "#f8f9ff",
+            "on-error": "#ffffff",
+            "on-error-container": "#93000a",
+            "surface-variant": "#d3e4fe",
+            "primary-fixed": "#dae2fd",
+            "error-container": "#ffdad6"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin-mobile": "16px",
+            "container-max": "1200px",
+            "section-gap": "48px",
+            "margin-desktop": "40px",
+            "gutter": "24px",
+            "base": "8px"
+          },
+          "fontFamily": {
+            "body-sm": ["Inter"],
+            "label-md": ["Inter"],
+            "headline-lg-mobile": ["Hanken Grotesk"],
+            "body-lg": ["Inter"],
+            "display-lg": ["Hanken Grotesk"],
+            "headline-md": ["Hanken Grotesk"],
+            "headline-lg": ["Hanken Grotesk"],
+            "body-md": ["Inter"],
+            "label-caps": ["JetBrains Mono"]
+          },
+          "fontSize": {
+            "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+            "label-md": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+            "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+            "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+            "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "headline-md": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+            "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+            "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .check-animation {
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .habit-card-completed {
+      opacity: 0.7;
+      transform: scale(0.99);
+      box-shadow: none !important;
+    }
+    .gradient-canvas {
+      background: linear-gradient(120deg, #f8f9ff 0%, #e5eeff 100%);
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen">
+<!-- TopAppBar Component -->
+<header class="w-full sticky top-0 z-40 bg-surface dark:bg-surface-dim shadow-sm">
+<div class="flex justify-between items-center h-16 px-margin-desktop w-full max-w-container-max mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-headline-lg font-headline-lg text-primary dark:text-inverse-primary tracking-tight">HabitFlow</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-primary dark:text-inverse-primary font-bold border-b-2 border-primary py-5" href="#">Dashboard</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors px-3 py-1 rounded-lg" href="#">Calendar</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors px-3 py-1 rounded-lg" href="#">Analytics</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden sm:flex items-center bg-surface-container px-4 py-2 rounded-full gap-2 group focus-within:ring-2 ring-on-tertiary-container transition-all">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm w-48" placeholder="Search habits..." type="text"/>
+</div>
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors">notifications</button>
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors">settings</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="User profile photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFF8-cU87qbfyTKm7NWIXfwdOHZTbuHd2TNL0icc2UXubCoqWe8AaGxaxRFgGt0Pt5-XptOIGWREwRpMGeZV_yMmYU0avwgOWOkyC-0uqj5Tv0VAmNwnNeZurse9EgktanMSGkWWEHeHGy4DbfqfPXyw0-rg4yrH8G-6W97IJrUan7mZ7oqjMbFXITcbc--MmOU_lvKmIlhjOpwk-HwpwSoasdZbvVACeOknLgvOPi97pk42e_iG6tcgc2FvcmA3fWjiVxkXIFn3aZ"/>
+</div>
+</div>
+</div>
+</header>
+<main class="flex max-w-container-max mx-auto min-h-[calc(100vh-64px)]">
+<!-- SideNavBar (Hidden on small/medium screens as per Shell Logic) -->
+<aside class="hidden lg:flex flex-col gap-base p-4 border-r border-outline-variant dark:border-outline bg-surface-container-lowest dark:bg-surface-container-low w-64 shrink-0">
+<div class="mb-8 p-4">
+<h2 class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary">HabitFlow</h2>
+<p class="text-on-surface-variant text-body-sm">Master your routine</p>
+</div>
+<div class="flex flex-col gap-2 flex-1">
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container dark:bg-secondary-fixed text-on-secondary-container dark:text-on-secondary-fixed rounded-xl font-semibold active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-container-highest rounded-xl transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span>Calendar</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-container-highest rounded-xl transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">insights</span>
+<span>Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-container-highest rounded-xl transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">person</span>
+<span>Settings</span>
+</a>
+</div>
+<div class="mt-auto pt-8 border-t border-outline-variant">
+<button class="w-full bg-primary text-on-primary py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 mb-4 hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined">add</span>
+          New Habit
+        </button>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant text-body-sm hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+            Help
+          </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant text-body-sm hover:text-error transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+            Logout
+          </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<div class="flex-1 px-margin-mobile md:px-margin-desktop py-8 overflow-y-auto">
+<!-- Welcome Header -->
+<section class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-section-gap">
+<div>
+<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background">Welcome back, Shashank! 👋</h1>
+<p class="text-on-surface-variant text-body-md mt-1">Consistency is the key to mastery. You have 3 habits left for today.</p>
+</div>
+<button class="bg-primary text-on-primary px-6 py-3 rounded-xl font-semibold flex items-center gap-2 shadow-sm hover:shadow-md active:scale-95 transition-all">
+<span class="material-symbols-outlined">add</span>
+          Create Habit
+        </button>
+</section>
+<!-- Bento Stats Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-section-gap">
+<!-- Today's Progress -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] border border-white flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div class="bg-surface-container-low p-3 rounded-xl">
+<span class="material-symbols-outlined text-on-tertiary-container">task_alt</span>
+</div>
+<span class="text-label-caps text-on-surface-variant">TODAY'S GOAL</span>
+</div>
+<div>
+<div class="flex items-baseline gap-2">
+<span class="text-display-lg font-display-lg text-on-surface">65</span>
+<span class="text-headline-md text-on-surface-variant">%</span>
+</div>
+<p class="text-body-sm text-on-surface-variant mt-1">4 of 6 habits completed</p>
+</div>
+<div class="w-full bg-surface-container rounded-full h-2 mt-2">
+<div class="bg-secondary-fixed-dim h-full rounded-full" style="width: 65%"></div>
+</div>
+</div>
+<!-- Current Streaks -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] border border-white flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div class="bg-orange-50 p-3 rounded-xl">
+<span class="material-symbols-outlined text-orange-600" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+</div>
+<span class="text-label-caps text-on-surface-variant">TOTAL STREAK</span>
+</div>
+<div>
+<div class="flex items-baseline gap-2">
+<span class="text-display-lg font-display-lg text-on-surface">12</span>
+<span class="text-headline-md text-on-surface-variant">Days</span>
+</div>
+<p class="text-body-sm text-on-surface-variant mt-1">Personal record: 24 days 🔥</p>
+</div>
+<div class="flex gap-1 mt-auto">
+<div class="w-full h-1 rounded-full bg-secondary-fixed"></div>
+<div class="w-full h-1 rounded-full bg-secondary-fixed"></div>
+<div class="w-full h-1 rounded-full bg-secondary-fixed"></div>
+<div class="w-full h-1 rounded-full bg-secondary-fixed"></div>
+<div class="w-full h-1 rounded-full bg-secondary-fixed"></div>
+<div class="w-full h-1 rounded-full bg-surface-container"></div>
+<div class="w-full h-1 rounded-full bg-surface-container"></div>
+</div>
+</div>
+<!-- Active Habits -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] border border-white flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div class="bg-blue-50 p-3 rounded-xl">
+<span class="material-symbols-outlined text-blue-600">trending_up</span>
+</div>
+<span class="text-label-caps text-on-surface-variant">ACTIVE FOCUS</span>
+</div>
+<div>
+<div class="flex items-baseline gap-2">
+<span class="text-display-lg font-display-lg text-on-surface">8</span>
+<span class="text-headline-md text-on-surface-variant">Habits</span>
+</div>
+<p class="text-body-sm text-on-surface-variant mt-1">+2 from previous week</p>
+</div>
+<div class="mt-auto">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-white bg-blue-100 flex items-center justify-center text-[10px] font-bold">WR</div>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-green-100 flex items-center justify-center text-[10px] font-bold">GY</div>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-purple-100 flex items-center justify-center text-[10px] font-bold">RD</div>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-surface-container text-[10px] font-bold flex items-center justify-center text-on-surface-variant">+5</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Main Columns -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-section-gap items-start">
+<!-- Left: Today's Habit List -->
+<div class="xl:col-span-2 space-y-6">
+<div class="flex justify-between items-center">
+<h2 class="font-headline-md text-headline-md text-on-surface">Today's Habits</h2>
+<div class="flex gap-2 bg-surface-container p-1 rounded-lg">
+<button class="px-3 py-1 bg-white shadow-sm rounded-md text-label-md">All</button>
+<button class="px-3 py-1 text-on-surface-variant text-label-md">Morning</button>
+<button class="px-3 py-1 text-on-surface-variant text-label-md">Evening</button>
+</div>
+</div>
+<!-- Habit List -->
+<div class="space-y-4">
+<!-- Habit Card 1 -->
+<div class="habit-card bg-surface-container-lowest p-5 rounded-2xl flex items-center justify-between shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] border border-white group hover:shadow-md transition-all cursor-pointer">
+<div class="flex items-center gap-5">
+<div class="bg-blue-50 text-blue-600 p-4 rounded-xl material-symbols-outlined text-[28px]">water_drop</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Hydrate Daily</h3>
+<div class="flex gap-3 mt-1">
+<span class="flex items-center gap-1 text-label-caps text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px]">timer</span> 2.5 Liters
+                    </span>
+<span class="flex items-center gap-1 text-label-caps text-orange-600 font-bold">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">local_fire_department</span> 15 Day Streak
+                    </span>
+</div>
+</div>
+</div>
+<button class="completion-toggle w-12 h-12 rounded-full border-2 border-outline-variant flex items-center justify-center text-transparent hover:border-secondary transition-all" onclick="toggleHabit(this)">
+<span class="material-symbols-outlined font-bold text-white">check</span>
+</button>
+</div>
+<!-- Habit Card 2 -->
+<div class="habit-card bg-surface-container-lowest p-5 rounded-2xl flex items-center justify-between shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] border border-white group hover:shadow-md transition-all cursor-pointer">
+<div class="flex items-center gap-5">
+<div class="bg-green-50 text-green-600 p-4 rounded-xl material-symbols-outlined text-[28px]">fitness_center</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Strength Training</h3>
+<div class="flex gap-3 mt-1">
+<span class="flex items-center gap-1 text-label-caps text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px]">timer</span> 45 Minutes
+                    </span>
+<span class="flex items-center gap-1 text-label-caps text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px]">event</span> Every Other Day
+                    </span>
+</div>
+</div>
+</div>
+<button class="completion-toggle w-12 h-12 rounded-full border-2 border-outline-variant flex items-center justify-center text-transparent hover:border-secondary transition-all" onclick="toggleHabit(this)">
+<span class="material-symbols-outlined font-bold text-white">check</span>
+</button>
+</div>
+<!-- Habit Card 3 (Already Completed State) -->
+<div class="habit-card habit-card-completed bg-surface-container-lowest p-5 rounded-2xl flex items-center justify-between shadow-none border border-white transition-all cursor-pointer">
+<div class="flex items-center gap-5">
+<div class="bg-purple-50 text-purple-600 p-4 rounded-xl material-symbols-outlined text-[28px]">menu_book</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface line-through">Deep Reading</h3>
+<div class="flex gap-3 mt-1">
+<span class="flex items-center gap-1 text-label-caps text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px]">timer</span> 20 Pages
+                    </span>
+</div>
+</div>
+</div>
+<button class="completion-toggle w-12 h-12 rounded-full bg-secondary-fixed text-on-secondary flex items-center justify-center transition-all" onclick="toggleHabit(this)">
+<span class="material-symbols-outlined font-bold text-white" style="font-variation-settings: 'FILL' 1;">check</span>
+</button>
+</div>
+<!-- Habit Card 4 -->
+<div class="habit-card bg-surface-container-lowest p-5 rounded-2xl flex items-center justify-between shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] border border-white group hover:shadow-md transition-all cursor-pointer">
+<div class="flex items-center gap-5">
+<div class="bg-amber-50 text-amber-600 p-4 rounded-xl material-symbols-outlined text-[28px]">self_improvement</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Meditation</h3>
+<div class="flex gap-3 mt-1">
+<span class="flex items-center gap-1 text-label-caps text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px]">timer</span> 10 Minutes
+                    </span>
+</div>
+</div>
+</div>
+<button class="completion-toggle w-12 h-12 rounded-full border-2 border-outline-variant flex items-center justify-center text-transparent hover:border-secondary transition-all" onclick="toggleHabit(this)">
+<span class="material-symbols-outlined font-bold text-white">check</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Right: Trends & Insights Sidebar -->
+<aside class="space-y-gutter">
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] border border-white">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-6">Weekly Activity</h3>
+<div class="grid grid-cols-7 gap-2 mb-4">
+<div class="text-center text-label-md text-on-surface-variant">M</div>
+<div class="text-center text-label-md text-on-surface-variant">T</div>
+<div class="text-center text-label-md text-on-surface-variant">W</div>
+<div class="text-center text-label-md text-on-surface-variant">T</div>
+<div class="text-center text-label-md text-on-surface-variant">F</div>
+<div class="text-center text-label-md text-on-surface-variant">S</div>
+<div class="text-center text-label-md text-on-surface-variant">S</div>
+</div>
+<div class="grid grid-cols-7 gap-2">
+<div class="aspect-square bg-secondary rounded-lg" title="100% completed"></div>
+<div class="aspect-square bg-secondary-fixed rounded-lg" title="80% completed"></div>
+<div class="aspect-square bg-secondary-container rounded-lg" title="60% completed"></div>
+<div class="aspect-square bg-secondary rounded-lg" title="100% completed"></div>
+<div class="aspect-square bg-surface-container rounded-lg" title="Today"></div>
+<div class="aspect-square bg-surface-container rounded-lg opacity-50"></div>
+<div class="aspect-square bg-surface-container rounded-lg opacity-50"></div>
+</div>
+<button class="w-full mt-6 text-on-tertiary-container font-semibold text-body-sm hover:underline flex items-center justify-center gap-1">
+              View Analytics <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+<div class="bg-primary-container p-6 rounded-2xl relative overflow-hidden group">
+<div class="relative z-10">
+<span class="text-label-caps text-on-primary-fixed-variant mb-2 block">QUICK TIP</span>
+<h4 class="text-headline-md text-white mb-3">Habit Stacking</h4>
+<p class="text-on-primary-container text-body-sm leading-relaxed">Try performing your new 10min Meditation right after your morning Hydration habit. Linking routines increases success by 40%.</p>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
+<span class="material-symbols-outlined text-[120px] text-white">tips_and_updates</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] border border-white">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-4">Upcoming Goals</h3>
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px] text-on-surface-variant">emoji_events</span>
+</div>
+<div>
+<p class="text-body-sm font-semibold text-on-surface">30 Day Water Challenge</p>
+<p class="text-label-md text-on-surface-variant">15 days remaining</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px] text-on-surface-variant">bedtime</span>
+</div>
+<div>
+<p class="text-body-sm font-semibold text-on-surface">Consistent Sleep Schedule</p>
+<p class="text-label-md text-on-surface-variant">Starts in 2 days</p>
+</div>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</main>
+<!-- Mobile Navigation Bar -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface shadow-[0_-4px_10px_rgba(0,0,0,0.05)] px-6 py-3 flex justify-between items-center z-50">
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="text-label-md">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="text-label-md">Plan</span>
+</button>
+<div class="relative -top-6">
+<button class="w-14 h-14 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[32px]">add</span>
+</button>
+</div>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">insights</span>
+<span class="text-label-md">Stats</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">person</span>
+<span class="text-label-md">Profile</span>
+</button>
+</nav>
+<script>
+    function toggleHabit(button) {
+      const card = button.closest('.habit-card');
+      const text = card.querySelector('h3');
+      const isCompleted = card.classList.contains('habit-card-completed');
+
+      if (!isCompleted) {
+        // Mark as completed
+        card.classList.add('habit-card-completed');
+        text.classList.add('line-through');
+        button.classList.add('bg-secondary-fixed', 'text-on-secondary');
+        button.classList.remove('border-outline-variant', 'text-transparent');
+        button.innerHTML = '<span class="material-symbols-outlined font-bold text-white" style="font-variation-settings: \'FILL\' 1;">check</span>';
+        
+        // Success micro-feedback toast
+        showToast("Great job! Habit completed.");
+      } else {
+        // Unmark
+        card.classList.remove('habit-card-completed');
+        text.classList.remove('line-through');
+        button.classList.remove('bg-secondary-fixed', 'text-on-secondary');
+        button.classList.add('border-outline-variant', 'text-transparent');
+        button.innerHTML = '<span class="material-symbols-outlined font-bold text-white">check</span>';
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-24 left-1/2 -translate-x-1/2 bg-[#ECFDF5] text-[#065F46] px-6 py-3 rounded-full shadow-lg font-medium text-body-sm z-[100] border border-[#A7F3D0] animate-bounce';
+      toast.innerText = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => toast.remove(), 500);
+      }, 2000);
+    }
+  </script>
+</body></html>

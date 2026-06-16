@@ -20,7 +20,9 @@ import {
   useColorModeValue,
   Spinner,
   SimpleGrid,
+  useColorMode,
 } from "@chakra-ui/react";
+import { motion } from "framer-motion";
 import NextLink from "next/link";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { subDays, format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay } from "date-fns";
@@ -31,6 +33,9 @@ export default function AnalyticsPage() {
   const { habits, isLoading } = useHabits(user?.id);
   const bg = useColorModeValue("gray.50", "gray.900");
   const cardBg = useColorModeValue("white", "gray.800");
+  const { colorMode } = useColorMode();
+  const textColor = useColorModeValue("gray.800", "white");
+  const secTextColor = useColorModeValue("gray.600", "gray.400");
 
   const { data: allLogs = [] } = useQuery({
     queryKey: ["allHabitLogs", user?.id],
@@ -165,12 +170,17 @@ export default function AnalyticsPage() {
   return (
     <Box minH="100vh" bg={bg}>
       <Navbar />
-      <Box maxW="7xl" mx="auto" px={4} py={8}>
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <Box maxW="7xl" mx="auto" px={4} py={8}>
         <VStack spacing={8} align="stretch">
           <Flex justify="space-between" align="center">
             <Box>
-              <Heading size="xl">Analytics Dashboard</Heading>
-              <Text color="gray.600" mt={2}>
+              <Heading size="xl" color={textColor}>Analytics Dashboard</Heading>
+              <Text color={secTextColor} mt={2}>
                 Track your progress and insights 📊
               </Text>
             </Box>
@@ -210,7 +220,7 @@ export default function AnalyticsPage() {
             <Card bg={cardBg}>
               <CardBody>
                 <VStack align="stretch" spacing={4}>
-                  <Heading size="md">Weekly Completion Rate</Heading>
+                  <Heading size="md" color={textColor}>Weekly Completion Rate</Heading>
                   <Box height={300}>
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={getWeeklyCompletionData()}>
@@ -229,7 +239,7 @@ export default function AnalyticsPage() {
             <Card bg={cardBg}>
               <CardBody>
                 <VStack align="stretch" spacing={4}>
-                  <Heading size="md">30-Day Trend</Heading>
+                  <Heading size="md" color={textColor}>30-Day Trend</Heading>
                   <Box height={300}>
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={getDailyCompletionData()}>
@@ -249,7 +259,7 @@ export default function AnalyticsPage() {
           <Card bg={cardBg}>
             <CardBody>
               <VStack align="stretch" spacing={4}>
-                <Heading size="md">Habit Performance</Heading>
+                <Heading size="md" color={textColor}>Habit Performance</Heading>
                 <Box height={400}>
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={getHabitPerformanceData()} layout="vertical">
@@ -271,7 +281,7 @@ export default function AnalyticsPage() {
           <Card bg={cardBg}>
             <CardBody>
               <VStack align="stretch" spacing={4}>
-                <Heading size="md">Best Performing Days</Heading>
+                <Heading size="md" color={textColor}>Best Performing Days</Heading>
                 <Box height={300}>
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={getBestDays()}>
@@ -288,33 +298,37 @@ export default function AnalyticsPage() {
           </Card>
         </VStack>
       </Box>
+      </motion.div>
     </Box>
   );
 }
 
 function StatCard({ title, value, color }: { title: string; value: string | number; color: string }) {
-  const colorMap: Record<string, string> = {
-    blue: "blue.100",
-    green: "green.100",
-    purple: "purple.100",
-    orange: "orange.100",
-  };
-
-  const textColorMap: Record<string, string> = {
-    blue: "blue.600",
-    green: "green.600",
-    purple: "purple.600",
-    orange: "orange.600",
-  };
+  const cardBg = useColorModeValue("white", "gray.800");
+  const titleColor = useColorModeValue("gray.600", "gray.400");
+  const valueColor = useColorModeValue(
+    {
+      blue: "blue.600",
+      green: "green.600",
+      purple: "purple.600",
+      orange: "orange.600",
+    }[color] || "blue.600",
+    {
+      blue: "blue.300",
+      green: "green.300",
+      purple: "purple.300",
+      orange: "orange.300",
+    }[color] || "blue.300"
+  );
 
   return (
-    <Card bg={useColorModeValue("white", "gray.800")}>
+    <Card bg={cardBg}>
       <CardBody>
         <VStack align="start" spacing={2}>
-          <Text fontSize="sm" color="gray.600">
+          <Text fontSize="sm" color={titleColor}>
             {title}
           </Text>
-          <Heading size="lg" color={textColorMap[color]}>
+          <Heading size="lg" color={valueColor}>
             {value}
           </Heading>
         </VStack>

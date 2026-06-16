@@ -23,6 +23,7 @@ import {
 import NextLink from "next/link";
 import { Plus, Flame, TrendingUp, Calendar } from "lucide-react";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -32,6 +33,8 @@ export default function DashboardPage() {
   const queryClient = useQueryClient();
   const bg = useColorModeValue("gray.50", "gray.900");
   const cardBg = useColorModeValue("white", "gray.800");
+  const textColor = useColorModeValue("gray.800", "white");
+  const secTextColor = useColorModeValue("gray.600", "gray.400");
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -89,12 +92,17 @@ export default function DashboardPage() {
   return (
     <Box minH="100vh" bg={bg}>
       <Navbar />
-      <Box maxW="6xl" mx="auto" px={4} py={8}>
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <Box maxW="6xl" mx="auto" px={4} py={8}>
         <VStack spacing={8} align="stretch">
           <Flex direction={{ base: "column", md: "row" }} justify="space-between" align={{ base: "start", md: "center" }} gap={4}>
             <Box>
-              <Heading size="xl">Welcome back, {user.user_metadata?.name || "Friend"}! 👋</Heading>
-              <Text color="gray.600" mt={2}>
+              <Heading size="xl" color={textColor}>Welcome back, {user.user_metadata?.name || "Friend"}! 👋</Heading>
+              <Text color={secTextColor} mt={2}>
                 Let&apos;s keep those streaks going!
               </Text>
             </Box>
@@ -121,10 +129,10 @@ export default function DashboardPage() {
                   <Calendar size={24} />
                 </Box>
                 <VStack align="start" spacing={1}>
-                  <Text fontSize="sm" color="gray.600">
+                  <Text fontSize="sm" color={secTextColor}>
                     Today&apos;s Progress
                   </Text>
-                  <Heading size="lg">
+                  <Heading size="lg" color={textColor}>
                     {completedToday}/{todayHabits.length}
                   </Heading>
                 </VStack>
@@ -151,13 +159,13 @@ export default function DashboardPage() {
                   <Flame size={24} />
                 </Box>
                 <VStack align="start" spacing={1}>
-                  <Text fontSize="sm" color="gray.600">
+                  <Text fontSize="sm" color={secTextColor}>
                     Total Streaks
                   </Text>
-                  <Heading size="lg">{totalStreakDays} days</Heading>
+                  <Heading size="lg" color={textColor}>{totalStreakDays} days</Heading>
                 </VStack>
               </Flex>
-              <Text fontSize="sm" color="gray.500" mt={4}>
+              <Text fontSize="sm" color={secTextColor} mt={4}>
                 Keep it up! Consistency is key 🔥
               </Text>
             </Box>
@@ -173,13 +181,13 @@ export default function DashboardPage() {
                   <TrendingUp size={24} />
                 </Box>
                 <VStack align="start" spacing={1}>
-                  <Text fontSize="sm" color="gray.600">
+                  <Text fontSize="sm" color={secTextColor}>
                     Active Habits
                   </Text>
-                  <Heading size="lg">{todayHabits.length}</Heading>
+                  <Heading size="lg" color={textColor}>{todayHabits.length}</Heading>
                 </VStack>
               </Flex>
-              <Text fontSize="sm" color="gray.500" mt={4}>
+              <Text fontSize="sm" color={secTextColor} mt={4}>
                 You&apos;re building momentum! 💪
               </Text>
             </Box>
@@ -188,8 +196,8 @@ export default function DashboardPage() {
           <Box bg={cardBg} borderRadius="lg" p={6}>
             <VStack spacing={4} align="stretch">
               <Flex justify="space-between" align="center">
-                <Heading size="md">Today&apos;s Habits</Heading>
-                <Text fontSize="sm" color="gray.500">
+                <Heading size="md" color={textColor}>Today&apos;s Habits</Heading>
+                <Text fontSize="sm" color={secTextColor}>
                   {new Date().toLocaleDateString("en-US", {
                     weekday: "long",
                     month: "short",
@@ -200,7 +208,7 @@ export default function DashboardPage() {
 
               {todayHabits.length === 0 ? (
                 <VStack py={8} spacing={4} align="center">
-                  <Text color="gray.500">
+                  <Text color={secTextColor}>
                     No habits scheduled for today. Time to create one!
                   </Text>
                   <Button
@@ -238,6 +246,7 @@ export default function DashboardPage() {
           </Box>
         </VStack>
       </Box>
+      </motion.div>
     </Box>
   );
 }

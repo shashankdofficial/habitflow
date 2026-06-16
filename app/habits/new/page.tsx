@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useHabits } from "@/hooks/useHabits";
 import { Navbar } from "@/components/Navbar";
+import { motion } from "framer-motion";
 import {
   Box,
   Button,
@@ -48,6 +49,8 @@ export default function NewHabitPage() {
   const { createHabit, isCreating } = useHabits(user?.id);
   const bg = useColorModeValue("gray.50", "gray.900");
   const cardBg = useColorModeValue("white", "gray.800");
+  const textColor = useColorModeValue("gray.800", "white");
+  const secTextColor = useColorModeValue("gray.600", "gray.400");
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -125,7 +128,12 @@ export default function NewHabitPage() {
   return (
     <Box minH="100vh" bg={bg}>
       <Navbar />
-      <Box maxW="2xl" mx="auto" px={4} py={8}>
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <Box maxW="2xl" mx="auto" px={4} py={8}>
         <VStack spacing={8} align="stretch">
           <Button
             as={NextLink}
@@ -141,8 +149,8 @@ export default function NewHabitPage() {
             <CardBody>
               <VStack align="stretch" spacing={6}>
                 <Box>
-                  <Heading size="xl">Create New Habit</Heading>
-                  <Text color="gray.600" mt={2}>
+                  <Heading size="xl" color={textColor}>Create New Habit</Heading>
+                  <Text color={secTextColor} mt={2}>
                     Start building positive habits today
                   </Text>
                 </Box>
@@ -157,7 +165,7 @@ export default function NewHabitPage() {
                 <form onSubmit={handleSubmit}>
                   <VStack spacing={6} align="stretch">
                     <FormControl isRequired>
-                      <FormLabel>Habit Name</FormLabel>
+                      <FormLabel color={textColor}>Habit Name</FormLabel>
                       <Input
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
@@ -166,7 +174,7 @@ export default function NewHabitPage() {
                     </FormControl>
 
                     <FormControl>
-                      <FormLabel>Description (optional)</FormLabel>
+                      <FormLabel color={textColor}>Description (optional)</FormLabel>
                       <Textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
@@ -176,7 +184,7 @@ export default function NewHabitPage() {
                     </FormControl>
 
                     <FormControl isRequired>
-                      <FormLabel>Frequency</FormLabel>
+                      <FormLabel color={textColor}>Frequency</FormLabel>
                       <Select
                         value={frequency}
                         onChange={(e) =>
@@ -190,7 +198,7 @@ export default function NewHabitPage() {
 
                     {frequency === "weekly" && (
                       <FormControl isRequired>
-                        <FormLabel>Days of Week</FormLabel>
+                        <FormLabel color={textColor}>Days of Week</FormLabel>
                         <CheckboxGroup
                           value={daysOfWeek.map(String)}
                           onChange={(values) =>
@@ -209,7 +217,7 @@ export default function NewHabitPage() {
                     )}
 
                     <FormControl>
-                      <FormLabel>Reminder Time (optional)</FormLabel>
+                      <FormLabel color={textColor}>Reminder Time (optional)</FormLabel>
                       <Input
                         type="time"
                         value={reminderTime}
@@ -218,7 +226,7 @@ export default function NewHabitPage() {
                     </FormControl>
 
                     <FormControl isRequired>
-                      <FormLabel>Color</FormLabel>
+                      <FormLabel color={textColor}>Color</FormLabel>
                       <Stack direction="row" spacing={3} wrap="wrap">
                         {[{ name: "Blue", value: "blue" },
                         { name: "Green", value: "green" },
@@ -240,7 +248,7 @@ export default function NewHabitPage() {
                     </FormControl>
 
                     <FormControl isRequired>
-                      <FormLabel>Icon</FormLabel>
+                      <FormLabel color={textColor}>Icon</FormLabel>
                       <Stack direction="row" spacing={3} wrap="wrap">
                         {ICONS.map((i) => (
                           <Button
@@ -272,9 +280,8 @@ export default function NewHabitPage() {
             </CardBody>
           </Card>
         </VStack>
-      </Box>
+        </Box>
+      </motion.div>
     </Box>
   );
 }
-
-

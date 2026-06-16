@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HabitFlow - Calendar Mastery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Hanken+Grotesk:wght@600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#bec6e0",
+                    "inverse-primary": "#bec6e0",
+                    "surface-container-high": "#dce9ff",
+                    "tertiary-container": "#001a42",
+                    "tertiary": "#000000",
+                    "on-secondary": "#ffffff",
+                    "on-background": "#0b1c30",
+                    "primary": "#000000",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#7c839b",
+                    "surface-container-low": "#eff4ff",
+                    "tertiary-fixed": "#d8e2ff",
+                    "surface": "#f8f9ff",
+                    "outline": "#76777d",
+                    "surface-tint": "#565e74",
+                    "secondary-container": "#6cf8bb",
+                    "error": "#ba1a1a",
+                    "primary-container": "#131b2e",
+                    "on-primary-fixed": "#131b2e",
+                    "on-surface": "#0b1c30",
+                    "on-tertiary-fixed": "#001a42",
+                    "outline-variant": "#c6c6cd",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-secondary-fixed": "#002113",
+                    "on-surface-variant": "#45464d",
+                    "background": "#f8f9ff",
+                    "secondary-fixed-dim": "#4edea3",
+                    "inverse-surface": "#213145",
+                    "on-tertiary-container": "#3980f4",
+                    "surface-dim": "#cbdbf5",
+                    "on-tertiary": "#ffffff",
+                    "secondary-fixed": "#6ffbbe",
+                    "inverse-on-surface": "#eaf1ff",
+                    "secondary": "#006c49",
+                    "tertiary-fixed-dim": "#adc6ff",
+                    "on-tertiary-fixed-variant": "#004395",
+                    "on-secondary-container": "#00714d",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed-variant": "#005236",
+                    "surface-container": "#e5eeff",
+                    "surface-bright": "#f8f9ff",
+                    "on-error": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "surface-variant": "#d3e4fe",
+                    "primary-fixed": "#dae2fd",
+                    "error-container": "#ffdad6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "container-max": "1200px",
+                    "section-gap": "48px",
+                    "margin-desktop": "40px",
+                    "gutter": "24px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "body-sm": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-lg-mobile": ["Hanken Grotesk"],
+                    "body-lg": ["Inter"],
+                    "display-lg": ["Hanken Grotesk"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "body-md": ["Inter"],
+                    "label-caps": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+        .heat-0 { background-color: #F1F5F9; }
+        .heat-25 { background-color: #DCFCE7; }
+        .heat-50 { background-color: #BBF7D0; }
+        .heat-75 { background-color: #4ADE80; }
+        .heat-100 { background-color: #10B981; color: white; }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(226, 232, 240, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface min-h-screen">
+<!-- Top Navigation Anchor -->
+<header class="w-full sticky top-0 z-40 bg-surface shadow-sm">
+<div class="flex justify-between items-center h-16 px-margin-desktop w-full max-w-container-max mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-headline-lg font-headline-lg text-primary tracking-tight">HabitFlow</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-on-surface-variant hover:bg-surface-container-low transition-colors px-3 py-1 rounded-lg font-body-md" href="#">Dashboard</a>
+<a class="text-primary font-bold border-b-2 border-primary px-3 py-1 font-body-md" href="#">Calendar</a>
+<a class="text-on-surface-variant hover:bg-surface-container-low transition-colors px-3 py-1 rounded-lg font-body-md" href="#">Analytics</a>
+<a class="text-on-surface-variant hover:bg-surface-container-low transition-colors px-3 py-1 rounded-lg font-body-md" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-container-low rounded-full transition-colors">notifications</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="User profile photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWHRlloaFjCqxsCfbDsSzJLj237WIALuYkAwPriCThyt-VMSlKjFWkDEXYGd2mAM-ke1t45PV6Ml_YQ5mTIJXhz6d3lxHcfu54_tvj9FvPIavm4xOh2C-cZpViI0PFuudbEZ8ibxKJiwtvDeg_ENn3bFbh8li7kiDy7zUfL_6YuZHC0Fx4fBOMEql6ADL4bi4AOUvHucuLhKWaaqs0RmrARAS1C_tpb7XF77Jkq3Tbuw9CuE4dORyX1yzNxTFrp3p9K-txPzRCkhjm"/>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-margin-desktop py-12">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-2">Calendar View</h1>
+<p class="text-on-surface-variant font-body-md">Track your habit consistency over time 🗓️</p>
+</div>
+<a class="inline-flex items-center gap-2 px-6 py-2.5 bg-surface-container-lowest border border-outline-variant text-on-surface font-semibold rounded-xl hover:bg-surface-container transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+                Back to Dashboard
+            </a>
+</div>
+<div class="flex flex-col lg:flex-row gap-gutter">
+<!-- Main Calendar Canvas -->
+<div class="flex-grow glass-card rounded-[24px] p-8 shadow-sm">
+<!-- Calendar Navigation -->
+<div class="flex justify-between items-center mb-8">
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors active:scale-90">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<h2 class="font-headline-md text-headline-md text-on-surface">June 2026</h2>
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors active:scale-90">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<button class="px-5 py-2 text-on-surface font-semibold rounded-lg hover:bg-surface-container transition-colors">Today</button>
+</div>
+<!-- Weekday Labels -->
+<div class="calendar-grid mb-4">
+<div class="text-center font-label-caps text-on-surface-variant py-2">SUN</div>
+<div class="text-center font-label-caps text-on-surface-variant py-2">MON</div>
+<div class="text-center font-label-caps text-on-surface-variant py-2">TUE</div>
+<div class="text-center font-label-caps text-on-surface-variant py-2">WED</div>
+<div class="text-center font-label-caps text-on-surface-variant py-2">THU</div>
+<div class="text-center font-label-caps text-on-surface-variant py-2">FRI</div>
+<div class="text-center font-label-caps text-on-surface-variant py-2">SAT</div>
+</div>
+<!-- Days Grid -->
+<div class="calendar-grid gap-3">
+<!-- Empty spacers for June 2026 (Starts on Monday) -->
+<div class="h-28 rounded-xl bg-transparent"></div>
+<!-- Calendar Cells with Heatmap logic -->
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-0 flex flex-col justify-between group hover:border-primary/20 transition-all cursor-pointer">
+<span class="font-label-caps">01</span>
+<div class="flex flex-col items-center">
+<span class="text-label-md font-label-md opacity-60">0/12</span>
+</div>
+</div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-25 flex flex-col justify-between group hover:border-primary/20 transition-all cursor-pointer">
+<span class="font-label-caps">02</span>
+<div class="flex flex-col items-center">
+<span class="text-label-md font-label-md opacity-80">3/12</span>
+</div>
+</div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-50 flex flex-col justify-between group hover:border-primary/20 transition-all cursor-pointer">
+<span class="font-label-caps">03</span>
+<div class="flex flex-col items-center">
+<span class="text-label-md font-label-md opacity-80">6/12</span>
+</div>
+</div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-50 flex flex-col justify-between group hover:border-primary/20 transition-all cursor-pointer">
+<span class="font-label-caps">04</span>
+<div class="flex flex-col items-center">
+<span class="text-label-md font-label-md opacity-80">7/12</span>
+</div>
+</div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-75 flex flex-col justify-between group hover:border-primary/20 transition-all cursor-pointer">
+<span class="font-label-caps">05</span>
+<div class="flex flex-col items-center">
+<span class="text-label-md font-label-md opacity-80">10/12</span>
+</div>
+</div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-100 flex flex-col justify-between ring-2 ring-primary group hover:shadow-lg transition-all cursor-pointer">
+<span class="font-label-caps">06</span>
+<div class="flex flex-col items-center">
+<span class="text-label-md font-label-md">12/12</span>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-75 flex flex-col justify-between transition-all cursor-pointer">
+<span class="font-label-caps">07</span>
+<div class="flex flex-col items-center"><span class="text-label-md">9/12</span></div>
+</div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-100 flex flex-col justify-between transition-all cursor-pointer">
+<span class="font-label-caps">08</span>
+<div class="flex flex-col items-center"><span class="text-label-md">12/12</span></div>
+</div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-50 flex flex-col justify-between transition-all cursor-pointer">
+<span class="font-label-caps">09</span>
+<div class="flex flex-col items-center"><span class="text-label-md">6/12</span></div>
+</div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-25 flex flex-col justify-between transition-all cursor-pointer">
+<span class="font-label-caps">10</span>
+<div class="flex flex-col items-center"><span class="text-label-md">2/12</span></div>
+</div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-0 flex flex-col justify-between transition-all cursor-pointer">
+<span class="font-label-caps">11</span>
+<div class="flex flex-col items-center"><span class="text-label-md opacity-40">0/12</span></div>
+</div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-50 flex flex-col justify-between transition-all cursor-pointer">
+<span class="font-label-caps">12</span>
+<div class="flex flex-col items-center"><span class="text-label-md">7/12</span></div>
+</div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-100 flex flex-col justify-between transition-all cursor-pointer">
+<span class="font-label-caps">13</span>
+<div class="flex flex-col items-center"><span class="text-label-md">12/12</span></div>
+</div>
+<!-- Remaining grid simplified for layout -->
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-100 flex flex-col justify-between transition-all cursor-pointer"><span class="font-label-caps">14</span><div class="flex flex-col items-center"><span class="text-label-md">12/12</span></div></div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-100 flex flex-col justify-between transition-all cursor-pointer bg-secondary-container/20 ring-2 ring-secondary"><span class="font-label-caps">15</span><div class="flex flex-col items-center"><span class="text-label-md text-on-secondary-container font-bold">Today</span></div></div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-0 flex flex-col justify-between opacity-50"><span class="font-label-caps">16</span></div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-0 flex flex-col justify-between opacity-50"><span class="font-label-caps">17</span></div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-0 flex flex-col justify-between opacity-50"><span class="font-label-caps">18</span></div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-0 flex flex-col justify-between opacity-50"><span class="font-label-caps">19</span></div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-0 flex flex-col justify-between opacity-50"><span class="font-label-caps">20</span></div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-0 flex flex-col justify-between opacity-50"><span class="font-label-caps">21</span></div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-0 flex flex-col justify-between opacity-50"><span class="font-label-caps">22</span></div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-0 flex flex-col justify-between opacity-50"><span class="font-label-caps">23</span></div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-0 flex flex-col justify-between opacity-50"><span class="font-label-caps">24</span></div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-0 flex flex-col justify-between opacity-50"><span class="font-label-caps">25</span></div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-0 flex flex-col justify-between opacity-50"><span class="font-label-caps">26</span></div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-0 flex flex-col justify-between opacity-50"><span class="font-label-caps">27</span></div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-0 flex flex-col justify-between opacity-50"><span class="font-label-caps">28</span></div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-0 flex flex-col justify-between opacity-50"><span class="font-label-caps">29</span></div>
+<div class="h-28 rounded-xl p-3 border border-outline-variant/30 heat-0 flex flex-col justify-between opacity-50"><span class="font-label-caps">30</span></div>
+</div>
+<!-- Legend -->
+<div class="mt-12 flex flex-wrap items-center gap-6 p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/20">
+<span class="text-label-md font-body-sm text-on-surface-variant">Consistency:</span>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-sm heat-0 border border-outline-variant/30"></div><span class="text-label-md">0%</span></div>
+<div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-sm heat-25"></div><span class="text-label-md">1-25%</span></div>
+<div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-sm heat-50"></div><span class="text-label-md">26-50%</span></div>
+<div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-sm heat-75"></div><span class="text-label-md">51-99%</span></div>
+<div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-sm heat-100"></div><span class="text-label-md">Mastery (100%)</span></div>
+</div>
+</div>
+</div>
+<!-- Insights Sidebar -->
+<aside class="w-full lg:w-80 flex flex-col gap-gutter">
+<!-- Stats Card -->
+<div class="glass-card rounded-[24px] p-6 shadow-sm">
+<h3 class="font-headline-md text-headline-md mb-6">Monthly Mastery</h3>
+<div class="space-y-6">
+<div>
+<div class="flex justify-between items-end mb-2">
+<span class="text-on-surface-variant text-body-sm">Completion Rate</span>
+<span class="font-headline-md text-primary">68%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary-fixed-dim" style="width: 68%"></div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-4 bg-surface-container rounded-xl">
+<p class="text-label-md text-on-surface-variant mb-1">Max Streak</p>
+<p class="font-headline-md flex items-center gap-2">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+                                    12
+                                </p>
+</div>
+<div class="p-4 bg-surface-container rounded-xl">
+<p class="text-label-md text-on-surface-variant mb-1">Total Done</p>
+<p class="font-headline-md flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">task_alt</span>
+                                    142
+                                </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Habits Summary -->
+<div class="glass-card rounded-[24px] p-6 shadow-sm flex-grow">
+<h3 class="font-headline-md text-headline-md mb-4">Focus Habits</h3>
+<div class="space-y-4">
+<div class="flex items-center gap-3 p-3 rounded-xl border border-outline-variant/30">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-on-tertiary-container">fitness_center</span>
+</div>
+<div class="flex-grow">
+<p class="text-body-sm font-semibold">Morning Workout</p>
+<div class="flex gap-1 mt-1">
+<div class="w-full h-1 bg-secondary-fixed rounded-full"></div>
+<div class="w-full h-1 bg-secondary-fixed rounded-full"></div>
+<div class="w-full h-1 bg-secondary-fixed rounded-full"></div>
+<div class="w-full h-1 bg-surface-container-high rounded-full"></div>
+<div class="w-full h-1 bg-surface-container-high rounded-full"></div>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3 p-3 rounded-xl border border-outline-variant/30">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-on-tertiary-container">menu_book</span>
+</div>
+<div class="flex-grow">
+<p class="text-body-sm font-semibold">Reading 30m</p>
+<div class="flex gap-1 mt-1">
+<div class="w-full h-1 bg-secondary-fixed rounded-full"></div>
+<div class="w-full h-1 bg-surface-container-high rounded-full"></div>
+<div class="w-full h-1 bg-surface-container-high rounded-full"></div>
+<div class="w-full h-1 bg-surface-container-high rounded-full"></div>
+<div class="w-full h-1 bg-surface-container-high rounded-full"></div>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3 p-3 rounded-xl border border-outline-variant/30">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-on-tertiary-container">self_improvement</span>
+</div>
+<div class="flex-grow">
+<p class="text-body-sm font-semibold">Daily Meditation</p>
+<div class="flex gap-1 mt-1">
+<div class="w-full h-1 bg-secondary-fixed rounded-full"></div>
+<div class="w-full h-1 bg-secondary-fixed rounded-full"></div>
+<div class="w-full h-1 bg-secondary-fixed rounded-full"></div>
+<div class="w-full h-1 bg-secondary-fixed rounded-full"></div>
+<div class="w-full h-1 bg-secondary-fixed rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+<button class="w-full mt-6 py-2.5 bg-primary text-white font-semibold rounded-xl hover:opacity-90 transition-all">View All Habits</button>
+</div>
+</aside>
+</div>
+</main>
+<!-- Bottom Navigation for Mobile -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface shadow-[0_-4px_12px_rgba(0,0,0,0.05)] px-margin-mobile py-4 flex justify-around items-center z-50">
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-medium">Dashboard</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
+<span class="text-[10px] font-bold">Calendar</span>
+</button>
+<div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center -mt-8 shadow-lg">
+<span class="material-symbols-outlined text-white">add</span>
+</div>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">insights</span>
+<span class="text-[10px] font-medium">Analytics</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</button>
+</nav>
+<script>
+        // Micro-interaction for calendar cells
+        document.querySelectorAll('.calendar-grid > div').forEach(cell => {
+            cell.addEventListener('click', function() {
+                if(this.classList.contains('cursor-pointer')) {
+                    this.classList.toggle('scale-95');
+                    setTimeout(() => this.classList.toggle('scale-95'), 100);
+                    // Open detailed day view logic would go here
+                }
+            });
+        });
+    </script>
+</body></html>

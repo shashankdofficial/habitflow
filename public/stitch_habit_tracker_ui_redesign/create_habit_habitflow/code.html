@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create New Habit - HabitFlow</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Fonts: Inter & Hanken Grotesk & JetBrains Mono -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Hanken+Grotesk:wght@600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "primary-fixed-dim": "#bec6e0",
+                  "inverse-primary": "#bec6e0",
+                  "surface-container-high": "#dce9ff",
+                  "tertiary-container": "#001a42",
+                  "tertiary": "#000000",
+                  "on-secondary": "#ffffff",
+                  "on-background": "#0b1c30",
+                  "primary": "#000000",
+                  "on-primary-fixed-variant": "#3f465c",
+                  "on-primary": "#ffffff",
+                  "on-primary-container": "#7c839b",
+                  "surface-container-low": "#eff4ff",
+                  "tertiary-fixed": "#d8e2ff",
+                  "surface": "#f8f9ff",
+                  "outline": "#76777d",
+                  "surface-tint": "#565e74",
+                  "secondary-container": "#6cf8bb",
+                  "error": "#ba1a1a",
+                  "primary-container": "#131b2e",
+                  "on-primary-fixed": "#131b2e",
+                  "on-surface": "#0b1c30",
+                  "on-tertiary-fixed": "#001a42",
+                  "outline-variant": "#c6c6cd",
+                  "surface-container-highest": "#d3e4fe",
+                  "on-secondary-fixed": "#002113",
+                  "on-surface-variant": "#45464d",
+                  "background": "#f8f9ff",
+                  "secondary-fixed-dim": "#4edea3",
+                  "inverse-surface": "#213145",
+                  "on-tertiary-container": "#3980f4",
+                  "surface-dim": "#cbdbf5",
+                  "on-tertiary": "#ffffff",
+                  "secondary-fixed": "#6ffbbe",
+                  "inverse-on-surface": "#eaf1ff",
+                  "secondary": "#006c49",
+                  "tertiary-fixed-dim": "#adc6ff",
+                  "on-tertiary-fixed-variant": "#004395",
+                  "on-secondary-container": "#00714d",
+                  "surface-container-lowest": "#ffffff",
+                  "on-secondary-fixed-variant": "#005236",
+                  "surface-container": "#e5eeff",
+                  "surface-bright": "#f8f9ff",
+                  "on-error": "#ffffff",
+                  "on-error-container": "#93000a",
+                  "surface-variant": "#d3e4fe",
+                  "primary-fixed": "#dae2fd",
+                  "error-container": "#ffdad6",
+                  "habit-blue": "#3B82F6",
+                  "habit-green": "#10B981",
+                  "habit-purple": "#8B5CF6",
+                  "habit-red": "#EF4444",
+                  "habit-orange": "#F59E0B",
+                  "habit-pink": "#EC4899"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "0.75rem",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "margin-mobile": "16px",
+                  "container-max": "1200px",
+                  "section-gap": "48px",
+                  "margin-desktop": "40px",
+                  "gutter": "24px",
+                  "base": "8px"
+          },
+          "fontFamily": {
+                  "body-sm": ["Inter"],
+                  "label-md": ["Inter"],
+                  "headline-lg-mobile": ["Hanken Grotesk"],
+                  "body-lg": ["Inter"],
+                  "display-lg": ["Hanken Grotesk"],
+                  "headline-md": ["Hanken Grotesk"],
+                  "headline-lg": ["Hanken Grotesk"],
+                  "body-md": ["Inter"],
+                  "label-caps": ["JetBrains Mono"]
+          },
+          "fontSize": {
+                  "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                  "label-md": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                  "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                  "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                  "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                  "headline-md": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                  "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                  "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                  "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .custom-shadow {
+      shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen">
+<!-- Shell Suppression Logic: Since this is a task-focused sub-page with a "Back" action, the Shell (Nav Bars) is suppressed to prioritize the focus. -->
+<main class="w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-base md:py-12 flex flex-col items-center">
+<!-- Top Action Area -->
+<div class="w-full max-w-2xl flex justify-start mb-8">
+<a class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] transition-transform group-hover:-translate-x-1">arrow_back</span>
+<span class="font-label-md text-label-md uppercase tracking-wider">Back to Dashboard</span>
+</a>
+</div>
+<!-- Main Content Canvas -->
+<div class="w-full max-w-2xl bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30 overflow-hidden">
+<!-- Header Section -->
+<div class="px-8 pt-10 pb-6 border-b border-outline-variant/20">
+<h1 class="font-headline-lg text-headline-lg text-primary mb-2">Create New Habit</h1>
+<p class="text-on-surface-variant font-body-md">Design a routine that fits your lifestyle. Consistency starts here.</p>
+</div>
+<!-- Form Content -->
+<form class="p-8 space-y-8" id="habit-form">
+<!-- Habit Name & Description -->
+<div class="space-y-6">
+<div class="space-y-2">
+<label class="font-headline-md text-headline-md block" for="habit-name">Habit Name <span class="text-error">*</span></label>
+<input class="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface focus:ring-2 focus:ring-tertiary-fixed-dim focus:border-primary transition-all outline-none text-body-md placeholder:text-on-surface-variant/50" id="habit-name" name="habit-name" placeholder="e.g., Morning Meditation" required="" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-headline-md text-headline-md block" for="habit-desc">Description <span class="text-on-surface-variant font-normal text-body-sm">(optional)</span></label>
+<textarea class="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface focus:ring-2 focus:ring-tertiary-fixed-dim focus:border-primary transition-all outline-none text-body-md resize-none placeholder:text-on-surface-variant/50" id="habit-desc" name="habit-desc" placeholder="Why is this habit important to you?" rows="3"></textarea>
+</div>
+</div>
+<!-- Frequency & Time -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="space-y-2">
+<label class="font-headline-md text-headline-md block" for="frequency">Frequency <span class="text-error">*</span></label>
+<div class="relative">
+<select class="w-full appearance-none px-4 py-3 rounded-lg border border-outline-variant bg-surface focus:ring-2 focus:ring-tertiary-fixed-dim focus:border-primary transition-all outline-none text-body-md pr-10 cursor-pointer" id="frequency" name="frequency">
+<option value="daily">Every Day</option>
+<option value="weekly">Weekly</option>
+<option value="custom">Custom Days</option>
+<option value="monthly">Monthly</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-headline-md text-headline-md block" for="reminder-time">Reminder Time <span class="text-on-surface-variant font-normal text-body-sm">(optional)</span></label>
+<div class="relative">
+<input class="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface focus:ring-2 focus:ring-tertiary-fixed-dim focus:border-primary transition-all outline-none text-body-md cursor-text" id="reminder-time" name="reminder-time" type="time"/>
+</div>
+</div>
+</div>
+<!-- Color Coding (Premium Selector) -->
+<div class="space-y-3">
+<label class="font-headline-md text-headline-md block">Visual Identity <span class="text-error">*</span></label>
+<div class="flex flex-wrap gap-3">
+<!-- Color Options -->
+<label class="cursor-pointer group relative">
+<input checked="" class="peer hidden" name="color-select" type="radio" value="blue"/>
+<div class="w-12 h-12 rounded-full bg-habit-blue border-4 border-transparent peer-checked:border-white peer-checked:ring-2 peer-checked:ring-habit-blue transition-all"></div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 font-label-caps text-label-caps transition-opacity">BLUE</span>
+</label>
+<label class="cursor-pointer group relative">
+<input class="peer hidden" name="color-select" type="radio" value="green"/>
+<div class="w-12 h-12 rounded-full bg-habit-green border-4 border-transparent peer-checked:border-white peer-checked:ring-2 peer-checked:ring-habit-green transition-all"></div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 font-label-caps text-label-caps transition-opacity">GREEN</span>
+</label>
+<label class="cursor-pointer group relative">
+<input class="peer hidden" name="color-select" type="radio" value="purple"/>
+<div class="w-12 h-12 rounded-full bg-habit-purple border-4 border-transparent peer-checked:border-white peer-checked:ring-2 peer-checked:ring-habit-purple transition-all"></div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 font-label-caps text-label-caps transition-opacity">PURPLE</span>
+</label>
+<label class="cursor-pointer group relative">
+<input class="peer hidden" name="color-select" type="radio" value="red"/>
+<div class="w-12 h-12 rounded-full bg-habit-red border-4 border-transparent peer-checked:border-white peer-checked:ring-2 peer-checked:ring-habit-red transition-all"></div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 font-label-caps text-label-caps transition-opacity">RED</span>
+</label>
+<label class="cursor-pointer group relative">
+<input class="peer hidden" name="color-select" type="radio" value="orange"/>
+<div class="w-12 h-12 rounded-full bg-habit-orange border-4 border-transparent peer-checked:border-white peer-checked:ring-2 peer-checked:ring-habit-orange transition-all"></div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 font-label-caps text-label-caps transition-opacity">ORANGE</span>
+</label>
+<label class="cursor-pointer group relative">
+<input class="peer hidden" name="color-select" type="radio" value="pink"/>
+<div class="w-12 h-12 rounded-full bg-habit-pink border-4 border-transparent peer-checked:border-white peer-checked:ring-2 peer-checked:ring-habit-pink transition-all"></div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 font-label-caps text-label-caps transition-opacity">PINK</span>
+</label>
+</div>
+</div>
+<!-- Icon Grid Selection -->
+<div class="space-y-3">
+<label class="font-headline-md text-headline-md block">Icon Representative <span class="text-error">*</span></label>
+<div class="grid grid-cols-5 sm:grid-cols-8 gap-4">
+<!-- Icon Choice -->
+<label class="cursor-pointer group">
+<input checked="" class="peer hidden" name="icon-select" type="radio" value="fitness"/>
+<div class="w-full aspect-square flex items-center justify-center rounded-xl bg-surface border-2 border-outline-variant/30 peer-checked:bg-primary-container peer-checked:border-primary transition-all">
+<span class="material-symbols-outlined text-on-surface-variant peer-checked:text-white" data-icon="fitness_center">fitness_center</span>
+</div>
+</label>
+<label class="cursor-pointer group">
+<input class="peer hidden" name="icon-select" type="radio" value="water"/>
+<div class="w-full aspect-square flex items-center justify-center rounded-xl bg-surface border-2 border-outline-variant/30 peer-checked:bg-primary-container peer-checked:border-primary transition-all">
+<span class="material-symbols-outlined text-on-surface-variant peer-checked:text-white" data-icon="water_drop">water_drop</span>
+</div>
+</label>
+<label class="cursor-pointer group">
+<input class="peer hidden" name="icon-select" type="radio" value="self_improvement"/>
+<div class="w-full aspect-square flex items-center justify-center rounded-xl bg-surface border-2 border-outline-variant/30 peer-checked:bg-primary-container peer-checked:border-primary transition-all">
+<span class="material-symbols-outlined text-on-surface-variant peer-checked:text-white" data-icon="self_improvement">self_improvement</span>
+</div>
+</label>
+<label class="cursor-pointer group">
+<input class="peer hidden" name="icon-select" type="radio" value="book"/>
+<div class="w-full aspect-square flex items-center justify-center rounded-xl bg-surface border-2 border-outline-variant/30 peer-checked:bg-primary-container peer-checked:border-primary transition-all">
+<span class="material-symbols-outlined text-on-surface-variant peer-checked:text-white" data-icon="menu_book">menu_book</span>
+</div>
+</label>
+<label class="cursor-pointer group">
+<input class="peer hidden" name="icon-select" type="radio" value="sleep"/>
+<div class="w-full aspect-square flex items-center justify-center rounded-xl bg-surface border-2 border-outline-variant/30 peer-checked:bg-primary-container peer-checked:border-primary transition-all">
+<span class="material-symbols-outlined text-on-surface-variant peer-checked:text-white" data-icon="bedtime">bedtime</span>
+</div>
+</label>
+<label class="cursor-pointer group">
+<input class="peer hidden" name="icon-select" type="radio" value="work"/>
+<div class="w-full aspect-square flex items-center justify-center rounded-xl bg-surface border-2 border-outline-variant/30 peer-checked:bg-primary-container peer-checked:border-primary transition-all">
+<span class="material-symbols-outlined text-on-surface-variant peer-checked:text-white" data-icon="work">work</span>
+</div>
+</label>
+<label class="cursor-pointer group">
+<input class="peer hidden" name="icon-select" type="radio" value="food"/>
+<div class="w-full aspect-square flex items-center justify-center rounded-xl bg-surface border-2 border-outline-variant/30 peer-checked:bg-primary-container peer-checked:border-primary transition-all">
+<span class="material-symbols-outlined text-on-surface-variant peer-checked:text-white" data-icon="restaurant">restaurant</span>
+</div>
+</label>
+<label class="cursor-pointer group">
+<input class="peer hidden" name="icon-select" type="radio" value="more"/>
+<div class="w-full aspect-square flex items-center justify-center rounded-xl bg-surface border-2 border-outline-variant/30 peer-checked:bg-primary-container peer-checked:border-primary transition-all">
+<span class="material-symbols-outlined text-on-surface-variant peer-checked:text-white" data-icon="more_horiz">more_horiz</span>
+</div>
+</label>
+</div>
+</div>
+<!-- Submit Section -->
+<div class="pt-6 border-t border-outline-variant/20 flex flex-col md:flex-row gap-4">
+<button class="flex-1 bg-habit-blue text-white font-headline-md py-4 rounded-xl hover:shadow-lg hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2" type="submit">
+            Create Habit
+            <span class="material-symbols-outlined" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</button>
+<button class="px-8 py-4 rounded-xl border border-outline-variant text-on-surface-variant hover:bg-surface-container transition-all font-headline-md active:scale-[0.98]" type="button">
+            Discard
+          </button>
+</div>
+</form>
+</div>
+<!-- Motivational Insight Card (Asymmetric Layout Element) -->
+<div class="w-full max-w-2xl mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="bg-surface-container p-6 rounded-xl border border-outline-variant/20 flex items-start gap-4">
+<div class="p-3 rounded-full bg-secondary-container text-on-secondary-container">
+<span class="material-symbols-outlined">auto_awesome</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md text-primary mb-1">Small Steps</h4>
+<p class="text-body-sm text-on-surface-variant">Atomic habits grow into major transformations. Start with something you can't say no to.</p>
+</div>
+</div>
+<div class="bg-surface-container-high p-6 rounded-xl border border-outline-variant/20 flex items-start gap-4">
+<div class="p-3 rounded-full bg-tertiary-fixed text-on-tertiary-fixed">
+<span class="material-symbols-outlined">insights</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md text-primary mb-1">Smart Tracking</h4>
+<p class="text-body-sm text-on-surface-variant">We'll analyze your consistency patterns to help you optimize your schedule automatically.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Success Toast (Hidden by default, triggered by JS) -->
+<div class="fixed bottom-margin-desktop left-1/2 -translate-x-1/2 translate-y-20 opacity-0 bg-secondary-container text-on-secondary-container px-6 py-4 rounded-full shadow-lg flex items-center gap-3 transition-all duration-500 z-50" id="success-toast">
+<span class="material-symbols-outlined text-habit-green" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-headline-md">Habit created successfully!</span>
+</div>
+<script>
+    // Simple micro-interaction for form submission
+    document.getElementById('habit-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const toast = document.getElementById('success-toast');
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      
+      // Reset form after a delay
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        this.reset();
+      }, 3000);
+    });
+
+    // Real-time hover state logic for icon grid selection (Already handled by Tailwind Peer/Checked)
+  </script>
+</body></html>

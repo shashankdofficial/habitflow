@@ -1,8 +1,7 @@
 {
-  "/habits/new/page": "app/habits/new/page.js",
-  "/(auth)/signup/page": "app/(auth)/signup/page.js",
   "/dashboard/page": "app/dashboard/page.js",
-  "/calendar/page": "app/calendar/page.js",
+  "/settings/page": "app/settings/page.js",
+  "/habits/new/page": "app/habits/new/page.js",
   "/analytics/page": "app/analytics/page.js",
-  "/settings/page": "app/settings/page.js"
+  "/calendar/page": "app/calendar/page.js"
 }
