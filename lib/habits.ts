@@ -1,4 +1,4 @@
-import { Habit, HabitLog, StreakData } from "@/types";
+import { Habit, HabitLog, StreakData, UserGamification, Achievement } from "@/types";
 import { startOfDay, subDays, format } from "date-fns";
 import { db } from "./firebase";
 import {
@@ -33,6 +33,9 @@ export async function getHabits(userId: string): Promise<Habit[]> {
       icon: data.icon,
       is_active: data.is_active,
       created_at: data.created_at,
+      target_value: data.target_value,
+      target_unit: data.target_unit,
+      time_of_day: data.time_of_day || "anytime",
     } as Habit;
   });
 
@@ -115,6 +118,7 @@ export async function getHabitLogs(habitId: string): Promise<HabitLog[]> {
         date: data.date,
         status: data.status,
         created_at: data.created_at,
+        value: data.value,
       } as HabitLog;
     });
 
@@ -125,18 +129,19 @@ export async function getHabitLogs(habitId: string): Promise<HabitLog[]> {
   }
 }
 
-export async function checkInHabit(habitId: string, date: Date) {
+export async function checkInHabit(habitId: string, date: Date, value?: number) {
   try {
     const dateStr = format(date, "yyyy-MM-dd");
     const docId = `${habitId}_${dateStr}`;
     const logRef = doc(db, "habit_logs", docId);
 
-    const logData = {
+    const logData = cleanUndefined({
       habit_id: habitId,
       date: dateStr,
       status: "completed",
       created_at: new Date().toISOString(),
-    };
+      value: value !== undefined ? value : undefined,
+    });
 
     await setDoc(logRef, logData, { merge: true });
     return { id: docId, ...logData } as HabitLog;
@@ -159,7 +164,7 @@ export async function undoCheckIn(habitId: string, date: Date) {
 }
 
 export function calculateStreak(logs: HabitLog[]): StreakData {
-  if (!logs || logs.length === 0) {
+  if (!logs || !Array.isArray(logs) || logs.length === 0) {
     return {
       currentStreak: 0,
       longestStreak: 0,
@@ -277,3 +282,109 @@ export function getHabitStatusForDay(habitId: string, date: Date, logs: HabitLog
   if (targetDate < today) return "missed";
   return "pending";
 }
+
+export async function getAllUserLogs(userId: string): Promise<HabitLog[]> {
+  try {
+    const habits = await getHabits(userId);
+    if (habits.length === 0) return [];
+    
+    const logsPromises = habits.map((h) => getHabitLogs(h.id));
+    const logsArrays = await Promise.all(logsPromises);
+    return logsArrays.flat();
+  } catch (err) {
+    console.error("getAllUserLogs error:", err);
+    return [];
+  }
+}
+
+export function calculateUserGamification(habits: Habit[], logs: HabitLog[]): UserGamification {
+  const safeHabits = Array.isArray(habits) ? habits : [];
+  const safeLogs = Array.isArray(logs) ? logs : [];
+  const completedLogs = safeLogs.filter((l) => l && l.status === "completed");
+  const totalCompletions = completedLogs.length;
+
+  let longestStreak = 0;
+  let currentStreak = 0;
+
+  safeHabits.forEach((habit) => {
+    if (!habit || !habit.id) return;
+    const habitLogs = safeLogs.filter((l) => l && l.habit_id === habit.id);
+    const streakData = calculateStreak(habitLogs);
+    if (streakData.longestStreak > longestStreak) longestStreak = streakData.longestStreak;
+    if (streakData.currentStreak > currentStreak) currentStreak = streakData.currentStreak;
+  });
+
+  const xp = totalCompletions * 50 + longestStreak * 25 + safeHabits.length * 10;
+
+  const level = Math.floor(Math.sqrt(xp / 100)) + 1;
+  const currentLevelBaseXP = Math.pow(level - 1, 2) * 100;
+  const nextLevelXP = Math.pow(level, 2) * 100;
+  const xpToNextLevel = nextLevelXP - xp;
+  const xpCurrentLevelProgress = Math.min(
+    100,
+    Math.max(0, Math.round(((xp - currentLevelBaseXP) / (nextLevelXP - currentLevelBaseXP)) * 100))
+  );
+
+  const achievements: Achievement[] = [
+    {
+      id: "first_step",
+      title: "First Step",
+      description: "Log your first habit completion",
+      icon: "emoji_events",
+      category: "general",
+      unlocked: totalCompletions >= 1,
+    },
+    {
+      id: "streak_7",
+      title: "On Fire 7-Day Streak",
+      description: "Reach a 7-day streak on any habit",
+      icon: "local_fire_department",
+      category: "streak",
+      unlocked: longestStreak >= 7,
+    },
+    {
+      id: "streak_30",
+      title: "Unstoppable 30-Day Streak",
+      description: "Reach a 30-day streak on any habit",
+      icon: "bolt",
+      category: "streak",
+      unlocked: longestStreak >= 30,
+    },
+    {
+      id: "century_club",
+      title: "Century Club",
+      description: "Complete 100 total habit check-ins",
+      icon: "workspace_premium",
+      category: "count",
+      unlocked: totalCompletions >= 100,
+    },
+    {
+      id: "early_bird",
+      title: "Early Bird Routine",
+      description: "Create & log a Morning routine habit",
+      icon: "wb_sunny",
+      category: "time",
+      unlocked: habits.some((h) => h.time_of_day === "morning") && totalCompletions >= 1,
+    },
+    {
+      id: "target_master",
+      title: "Target Master",
+      description: "Track a quantitative habit with targets",
+      icon: "water_drop",
+      category: "general",
+      unlocked: habits.some((h) => h.target_value && h.target_value > 0) && totalCompletions >= 1,
+    },
+  ];
+
+  return {
+    xp,
+    level,
+    xpToNextLevel,
+    xpCurrentLevelProgress,
+    totalCompletions,
+    longestStreak,
+    currentStreak,
+    achievements,
+  };
+}
+

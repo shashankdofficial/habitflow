@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useHabits } from "@/hooks/useHabits";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { Habit } from "@/types";
+import { generateAIHabitSuggestions, AIRecommendedHabit } from "@/lib/ai";
 import toast from "react-hot-toast";
 
-// Icon options list (corresponds to getIconElement mapper inside HabitCard.tsx)
 const ICONS = [
   { name: "fitness_center", label: "Fitness" },
   { name: "water_drop", label: "Water" },
@@ -40,14 +40,18 @@ const DAYS = [
   { label: "Sat", value: 6 },
 ];
 
-export default function NewHabitPage() {
+function NewHabitContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
   const { createHabit, isCreating } = useHabits(user?.id);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [frequency, setFrequency] = useState<"daily" | "weekly">("daily");
+  const [timeOfDay, setTimeOfDay] = useState<"morning" | "afternoon" | "evening" | "anytime">("anytime");
+  const [targetValue, setTargetValue] = useState<string>("");
+  const [targetUnit, setTargetUnit] = useState<string>("");
   const [showCustomDays, setShowCustomDays] = useState(false);
   const [daysOfWeek, setDaysOfWeek] = useState<number[]>([0, 1, 2, 3, 4, 5, 6]);
   const [reminderTime, setReminderTime] = useState("");
@@ -55,11 +59,23 @@ export default function NewHabitPage() {
   const [icon, setIcon] = useState("fitness_center");
   const [error, setError] = useState("");
 
+  // AI Modal States
+  const [showAIModal, setShowAIModal] = useState(false);
+  const [aiGoalInput, setAiGoalInput] = useState("");
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [aiSuggestions, setAiSuggestions] = useState<AIRecommendedHabit[]>([]);
+
   useEffect(() => {
     if (!authLoading && !user) {
       router.push("/login");
     }
   }, [user, authLoading, router]);
+
+  useEffect(() => {
+    if (searchParams.get("ai") === "true") {
+      setShowAIModal(true);
+    }
+  }, [searchParams]);
 
   const handleDayToggle = (dayVal: number) => {
     if (daysOfWeek.includes(dayVal)) {
@@ -67,6 +83,30 @@ export default function NewHabitPage() {
     } else {
       setDaysOfWeek([...daysOfWeek, dayVal].sort());
     }
+  };
+
+  const handleGenerateAI = async () => {
+    if (!aiGoalInput.trim()) {
+      toast.error("Please type a goal first");
+      return;
+    }
+    setIsGeneratingAI(true);
+    const results = await generateAIHabitSuggestions(aiGoalInput.trim());
+    setAiSuggestions(results);
+    setIsGeneratingAI(false);
+  };
+
+  const applyAISuggestion = (s: AIRecommendedHabit) => {
+    setTitle(s.title);
+    setDescription(s.description);
+    setFrequency(s.frequency);
+    setTimeOfDay(s.time_of_day);
+    if (s.target_value) setTargetValue(s.target_value.toString());
+    if (s.target_unit) setTargetUnit(s.target_unit);
+    if (s.color) setColor(s.color);
+    if (s.icon) setIcon(s.icon);
+    setShowAIModal(false);
+    toast.success(`Applied AI template for "${s.title}"! 🎉`);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -84,11 +124,16 @@ export default function NewHabitPage() {
       return;
     }
 
+    const numTarget = targetValue ? parseFloat(targetValue) : undefined;
+
     const habitData: Omit<Habit, "id" | "created_at"> = {
       user_id: user.id,
       title: title.trim(),
       description: description.trim() || undefined,
       frequency,
+      time_of_day: timeOfDay,
+      target_value: numTarget && numTarget > 0 ? numTarget : undefined,
+      target_unit: targetUnit.trim() || undefined,
       days_of_week: frequency === "weekly" || showCustomDays ? (daysOfWeek.length > 0 ? daysOfWeek : undefined) : undefined,
       reminder_time: reminderTime || undefined,
       color,
@@ -98,7 +143,6 @@ export default function NewHabitPage() {
 
     createHabit(habitData, {
       onSuccess: () => {
-        toast.success("Habit created successfully!");
         router.push("/dashboard");
       },
       onError: (err: any) => {
@@ -122,10 +166,9 @@ export default function NewHabitPage() {
 
   return (
     <div className="bg-surface dark:bg-zinc-950 text-on-surface dark:text-zinc-100 font-sans min-h-screen">
-      {/* Shell Suppression layout */}
       <main className="w-full px-margin-mobile md:px-margin-desktop py-8 md:py-12 flex flex-col items-center">
         {/* Top Back Nav Link */}
-        <div className="w-full max-w-2xl flex justify-start mb-8">
+        <div className="w-full max-w-2xl flex justify-between items-center mb-8">
           <Link
             href="/dashboard"
             className="flex items-center gap-2 text-on-surface-variant dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors group"
@@ -137,6 +180,14 @@ export default function NewHabitPage() {
               BACK TO DASHBOARD
             </span>
           </Link>
+
+          <button
+            onClick={() => setShowAIModal(true)}
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm hover:shadow flex items-center gap-1.5 transition cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-sm">auto_awesome</span>
+            AI Habit Assistant
+          </button>
         </div>
 
         {/* Form Container */}
@@ -169,7 +220,7 @@ export default function NewHabitPage() {
                   id="habit-name"
                   type="text"
                   required
-                  placeholder="e.g., Morning Meditation"
+                  placeholder="e.g., Drink Water or Read Books"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className="w-full px-4 py-3 rounded-lg border border-outline-variant dark:border-zinc-800 bg-surface dark:bg-zinc-950 text-on-surface dark:text-zinc-100 placeholder:text-on-surface-variant/50 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
@@ -191,7 +242,52 @@ export default function NewHabitPage() {
               </div>
             </div>
 
-            {/* Frequency & Time */}
+            {/* Time of Day & Target Goals */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <label className="font-display text-sm font-bold text-on-surface dark:text-zinc-200 block">
+                  Time of Day Routine
+                </label>
+                <select
+                  value={timeOfDay}
+                  onChange={(e: any) => setTimeOfDay(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg border border-outline-variant dark:border-zinc-800 bg-surface dark:bg-zinc-950 text-on-surface dark:text-zinc-100 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                >
+                  <option value="anytime">Anytime ⏱️</option>
+                  <option value="morning">Morning 🌅</option>
+                  <option value="afternoon">Afternoon ☀️</option>
+                  <option value="evening">Evening 🌙</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="font-display text-sm font-bold text-on-surface dark:text-zinc-200 block">
+                  Target Amount <span className="text-xs text-zinc-400 font-normal">(optional)</span>
+                </label>
+                <input
+                  type="number"
+                  placeholder="e.g. 2000 or 20"
+                  value={targetValue}
+                  onChange={(e) => setTargetValue(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg border border-outline-variant dark:border-zinc-800 bg-surface dark:bg-zinc-950 text-on-surface dark:text-zinc-100 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all font-mono"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="font-display text-sm font-bold text-on-surface dark:text-zinc-200 block">
+                  Unit <span className="text-xs text-zinc-400 font-normal">(optional)</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. ml, pages, mins"
+                  value={targetUnit}
+                  onChange={(e) => setTargetUnit(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg border border-outline-variant dark:border-zinc-800 bg-surface dark:bg-zinc-950 text-on-surface dark:text-zinc-100 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all font-mono"
+                />
+              </div>
+            </div>
+
+            {/* Frequency & Reminder Time */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-gutter">
               <div className="space-y-2">
                 <label htmlFor="frequency" className="font-display text-headline-md font-bold text-on-surface dark:text-zinc-200 block">
@@ -345,33 +441,109 @@ export default function NewHabitPage() {
             </div>
           </form>
         </div>
-
-        {/* Bottom Motivational Cards */}
-        <div className="w-full max-w-2xl mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-surface-container dark:bg-zinc-900 p-6 rounded-xl border border-outline-variant/20 dark:border-zinc-800/80 flex items-start gap-4 shadow-sm">
-            <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-900 dark:text-blue-300 shrink-0">
-              <span className="material-symbols-outlined text-[20px]">auto_awesome</span>
-            </div>
-            <div>
-              <h4 className="font-display text-headline-md font-bold text-primary dark:text-white mb-1">Small Steps</h4>
-              <p className="text-body-sm text-on-surface-variant dark:text-zinc-400 leading-relaxed">
-                Atomic habits grow into major transformations. Start with something you can&apos;t say no to.
-              </p>
-            </div>
-          </div>
-          <div className="bg-surface-container dark:bg-zinc-900 p-6 rounded-xl border border-outline-variant/20 dark:border-zinc-800/80 flex items-start gap-4 shadow-sm">
-            <div className="p-3 rounded-full bg-slate-200 dark:bg-zinc-800 text-primary dark:text-zinc-300 shrink-0">
-              <span className="material-symbols-outlined text-[20px]">insights</span>
-            </div>
-            <div>
-              <h4 className="font-display text-headline-md font-bold text-primary dark:text-white mb-1">Smart Tracking</h4>
-              <p className="text-body-sm text-on-surface-variant dark:text-zinc-400 leading-relaxed">
-                We&apos;ll analyze your consistency patterns to help you optimize your schedule automatically.
-              </p>
-            </div>
-          </div>
-        </div>
       </main>
+
+      {/* AI Generator Modal */}
+      <AnimatePresence>
+        {showAIModal && (
+          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-zinc-900 text-white rounded-3xl max-w-lg w-full p-6 border border-zinc-800 shadow-2xl relative"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-blue-500/20 text-blue-400 rounded-2xl border border-blue-500/30">
+                    <span className="material-symbols-outlined text-2xl">auto_awesome</span>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-white">AI Habit Generator</h2>
+                    <p className="text-xs text-zinc-400">Describe your overall goal to generate customized habit templates</p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setShowAIModal(false)}
+                  className="p-2 text-zinc-400 hover:text-white rounded-full hover:bg-zinc-800 transition"
+                >
+                  <span className="material-symbols-outlined">close</span>
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="text-xs font-semibold text-zinc-300 block mb-1">Your Goal / Objective</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., Prepare for a marathon, Improve sleep quality, Read more books"
+                    value={aiGoalInput}
+                    onChange={(e) => setAiGoalInput(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-zinc-950 border border-zinc-800 text-white text-sm focus:border-blue-500 outline-none"
+                  />
+                </div>
+
+                <button
+                  onClick={handleGenerateAI}
+                  disabled={isGeneratingAI}
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-sm font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition"
+                >
+                  <span className="material-symbols-outlined text-lg">
+                    {isGeneratingAI ? "sync" : "auto_awesome"}
+                  </span>
+                  {isGeneratingAI ? "Generating Habits..." : "Generate Habit Templates"}
+                </button>
+
+                {/* AI Suggestions Results */}
+                {aiSuggestions.length > 0 && (
+                  <div className="space-y-3 pt-2 max-h-[50vh] overflow-y-auto pr-1">
+                    <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Recommended Habits:</h4>
+                    {aiSuggestions.map((sug, idx) => (
+                      <div
+                        key={idx}
+                        onClick={() => applyAISuggestion(sug)}
+                        className="p-4 rounded-2xl bg-zinc-800/80 hover:bg-zinc-800 border border-zinc-700/60 hover:border-blue-500/60 transition cursor-pointer flex items-center justify-between group"
+                      >
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-sm text-white group-hover:text-blue-400 transition">{sug.title}</span>
+                            <span className="text-[10px] bg-zinc-700 px-2 py-0.5 rounded-full text-zinc-300 uppercase font-mono">{sug.time_of_day}</span>
+                          </div>
+                          <p className="text-xs text-zinc-400">{sug.description}</p>
+                          {sug.target_value && (
+                            <span className="text-[11px] font-mono text-blue-300 block">
+                              Target: {sug.target_value} {sug.target_unit}
+                            </span>
+                          )}
+                        </div>
+
+                        <span className="material-symbols-outlined text-zinc-400 group-hover:text-blue-400 group-hover:translate-x-1 transition">
+                          arrow_forward
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
+  );
+}
+
+export default function NewHabitPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-surface dark:bg-zinc-950 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary dark:border-white"></div>
+        </div>
+      }
+    >
+      <NewHabitContent />
+    </Suspense>
   );
 }

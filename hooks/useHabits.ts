@@ -57,6 +57,8 @@ export function useHabits(userId: string | undefined) {
     mutationFn: deleteHabit,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["habits"] });
+      queryClient.invalidateQueries({ queryKey: ["allHabitLogs"] });
+      queryClient.invalidateQueries({ queryKey: ["allLogs"] });
       toast.success("Habit deleted successfully!");
     },
     onError: () => {
@@ -90,10 +92,11 @@ export function useHabitLogs(habitId: string) {
   });
 
   const checkInMutation = useMutation({
-    mutationFn: (date: Date) => checkInHabit(habitId, date),
+    mutationFn: ({ date, value }: { date: Date; value?: number }) => checkInHabit(habitId, date, value),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["habitLogs", habitId] });
-      toast.success("Great job! Keep it up! 🔥");
+      queryClient.invalidateQueries({ queryKey: ["allLogs"] });
+      queryClient.invalidateQueries({ queryKey: ["habits"] });
     },
     onError: () => {
       toast.error("Failed to check in");
@@ -104,6 +107,7 @@ export function useHabitLogs(habitId: string) {
     mutationFn: (date: Date) => undoCheckIn(habitId, date),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["habitLogs", habitId] });
+      queryClient.invalidateQueries({ queryKey: ["allLogs"] });
       queryClient.invalidateQueries({ queryKey: ["habits"] });
       toast.success("Check-in undone");
     },
@@ -115,8 +119,10 @@ export function useHabitLogs(habitId: string) {
   return {
     logs,
     isLoading,
-    checkIn: checkInMutation.mutate,
-    undoCheckIn: undoMutation.mutate,
+    checkIn: (date: Date, value?: number, options?: any) =>
+      checkInMutation.mutate({ date, value }, options),
+    undoCheckIn: (date: Date, options?: any) =>
+      undoMutation.mutate(date, options),
     isCheckingIn: checkInMutation.isPending,
     isUndoing: undoMutation.isPending,
   };

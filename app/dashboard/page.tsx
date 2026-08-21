@@ -5,9 +5,12 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useTodayHabits } from "@/hooks/useHabits";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getHabitLogs } from "@/lib/habits";
+import { getHabitLogs, calculateUserGamification } from "@/lib/habits";
+import { Habit } from "@/types";
 import { Navbar } from "@/components/Navbar";
 import { HabitCard } from "@/components/HabitCard";
+import { GamificationHeader } from "@/components/GamificationHeader";
+import { AICoachWidget } from "@/components/AICoachWidget";
 import Link from "next/link";
 import { subDays, format, isSameDay } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
@@ -19,7 +22,9 @@ export default function DashboardPage() {
   const { todayHabits, isLoading, habitStreaks, getHabitStatus, setAllLogs } =
     useTodayHabits(user?.id);
   const queryClient = useQueryClient();
-  const [activeFilter, setActiveFilter] = useState<"all" | "daily" | "weekly">("all");
+
+  const [activeFrequencyFilter, setActiveFrequencyFilter] = useState<"all" | "daily" | "weekly">("all");
+  const [activeRoutineFilter, setActiveRoutineFilter] = useState<"all" | "morning" | "afternoon" | "evening">("all");
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -50,6 +55,9 @@ export default function DashboardPage() {
 
   const logsList = allLogs || [];
 
+  // Calculate User Gamification (XP, Levels, Achievements)
+  const gamification = calculateUserGamification(todayHabits, logsList);
+
   const completedTodayList = todayHabits.filter((habit) => {
     const logs = logsList.filter((log) => log.habit_id === habit.id && log.status === "completed");
     const today = new Date();
@@ -73,15 +81,41 @@ export default function DashboardPage() {
     ? Math.max(...habitStreaks.map(s => s.longestStreak)) 
     : 0;
 
-  // Filter habits based on Frequency and Search Query
+  // Filter habits based on Frequency, Routine Time-of-day, and Search Query
   const { searchQuery } = useSearchStore();
 
+  const getHabitRoutineMatch = (habit: Habit, filter: string) => {
+    if (filter === "all") return true;
+    const tod = habit.time_of_day || "anytime";
+    if (tod === "anytime") return true;
+    if (tod === filter) return true;
+    if (habit.title.toLowerCase().includes(filter)) return true;
+    return false;
+  };
+
+  const routineCounts = {
+    all: todayHabits.length,
+    morning: todayHabits.filter((h) => getHabitRoutineMatch(h, "morning")).length,
+    afternoon: todayHabits.filter((h) => getHabitRoutineMatch(h, "afternoon")).length,
+    evening: todayHabits.filter((h) => getHabitRoutineMatch(h, "evening")).length,
+  };
+
   const filteredHabits = todayHabits.filter((habit) => {
-    const matchesFrequency = activeFilter === "all" || habit.frequency === activeFilter;
-    const matchesSearch = !searchQuery || 
-      habit.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      !!(habit.description && habit.description.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesFrequency && matchesSearch;
+    const matchesRoutine = getHabitRoutineMatch(habit, activeRoutineFilter);
+    const matchesFrequency = activeFrequencyFilter === "all" || habit.frequency === activeFrequencyFilter;
+
+    let matchesSearch = true;
+    if (searchQuery && searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      matchesSearch =
+        habit.title.toLowerCase().includes(q) ||
+        (!!habit.description && habit.description.toLowerCase().includes(q)) ||
+        habit.frequency.toLowerCase().includes(q) ||
+        (!!habit.time_of_day && habit.time_of_day.toLowerCase().includes(q)) ||
+        (!!habit.target_unit && habit.target_unit.toLowerCase().includes(q));
+    }
+
+    return matchesRoutine && matchesFrequency && matchesSearch;
   });
 
   // Calculate Last 7 Days Activity
@@ -93,7 +127,7 @@ export default function DashboardPage() {
       const total = todayHabits.length;
       const rate = total > 0 ? (completed / total) * 100 : 0;
       return {
-        label: format(date, "EEEEE"), // single letter: M, T, W...
+        label: format(date, "EEEEE"),
         rate,
         isToday: isSameDay(date, new Date()),
         dateStr: format(date, "MMM d"),
@@ -121,8 +155,11 @@ export default function DashboardPage() {
         transition={{ duration: 0.4 }}
         className="w-full px-margin-mobile md:px-margin-desktop py-8"
       >
+        {/* Gamification Level & XP Header */}
+        <GamificationHeader gamification={gamification} />
+
         {/* Welcome Header */}
-        <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-section-gap">
+        <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
             <h1 className="font-display text-headline-lg-mobile md:text-headline-lg text-on-background dark:text-white font-bold">
               Welcome back, {user.user_metadata?.name || "Friend"}! 👋
@@ -138,15 +175,22 @@ export default function DashboardPage() {
           </div>
           <Link
             href="/habits/new"
-            className="bg-primary dark:bg-zinc-100 text-on-primary dark:text-zinc-900 px-6 py-3 rounded-xl font-semibold flex items-center gap-2 shadow-sm hover:shadow-md hover:opacity-90 active:scale-95 transition-all"
+            className="bg-primary dark:bg-zinc-100 text-on-primary dark:text-zinc-900 px-6 py-3 rounded-2xl font-semibold flex items-center gap-2 shadow-sm hover:shadow-md hover:opacity-90 active:scale-95 transition-all"
           >
             <span className="material-symbols-outlined text-[20px]">add</span>
             <span>Create Habit</span>
           </Link>
         </section>
 
+        {/* AI Habit Coach Widget */}
+        <AICoachWidget
+          habits={todayHabits}
+          logs={logsList}
+          onOpenAIGenerator={() => router.push("/habits/new?ai=true")}
+        />
+
         {/* Bento Stats Grid */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-section-gap">
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-8">
           {/* Today's Progress */}
           <div className="bg-surface-container-lowest dark:bg-zinc-900 p-6 rounded-2xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] border border-white dark:border-zinc-800 flex flex-col gap-4">
             <div className="flex justify-between items-start">
@@ -191,7 +235,6 @@ export default function DashboardPage() {
                 Personal record: {maxStreak} days 🔥
               </p>
             </div>
-            {/* Dynamic streak sparks indicators */}
             <div className="flex gap-1 mt-auto">
               {last7Days.map((day, idx) => (
                 <div
@@ -209,7 +252,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Active Habits */}
+          {/* Active Focus */}
           <div className="bg-surface-container-lowest dark:bg-zinc-900 p-6 rounded-2xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] border border-white dark:border-zinc-800 flex flex-col gap-4">
             <div className="flex justify-between items-start">
               <div className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded-xl text-blue-600 dark:text-blue-400">
@@ -228,18 +271,10 @@ export default function DashboardPage() {
             </div>
             <div className="mt-auto">
               <div className="flex -space-x-2">
-                {todayHabits.slice(0, 3).map((h, i) => (
+                {todayHabits.slice(0, 3).map((h) => (
                   <div
                     key={h.id}
-                    className={`w-8 h-8 rounded-full border-2 border-white dark:border-zinc-950 flex items-center justify-center text-[10px] font-bold text-white uppercase bg-${h.color}-500`}
-                    style={{
-                      backgroundColor:
-                        h.color === "blue" ? "#3B82F6" :
-                        h.color === "green" ? "#10B981" :
-                        h.color === "purple" ? "#8B5CF6" :
-                        h.color === "red" ? "#EF4444" :
-                        h.color === "orange" ? "#F59E0B" : "#EC4899"
-                    }}
+                    className="w-8 h-8 rounded-full border-2 border-white dark:border-zinc-950 flex items-center justify-center text-[10px] font-bold text-white uppercase bg-blue-500"
                   >
                     {h.title.slice(0, 2)}
                   </div>
@@ -258,45 +293,94 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-section-gap items-start">
           {/* Left Column: Habits List */}
           <div className="xl:col-span-2 space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <h2 className="font-display text-headline-md font-bold text-on-surface dark:text-white">
-                Today&apos;s Habits
+                Today&apos;s Routines
               </h2>
-              <div className="flex gap-1 bg-surface-container dark:bg-zinc-800 p-1 rounded-lg">
+
+              {/* Routine Time-of-Day Filters */}
+              <div className="flex flex-wrap gap-1 bg-surface-container dark:bg-zinc-900 p-1.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800">
                 <button
-                  onClick={() => setActiveFilter("all")}
-                  className={`px-3 py-1 rounded-md text-label-md transition-all font-medium ${
-                    activeFilter === "all"
-                      ? "bg-surface-container-lowest dark:bg-zinc-700 shadow-sm text-primary dark:text-white"
-                      : "text-on-surface-variant dark:text-zinc-400"
+                  onClick={() => setActiveRoutineFilter("all")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    activeRoutineFilter === "all"
+                      ? "bg-white dark:bg-zinc-800 shadow-sm text-blue-600 dark:text-white font-bold"
+                      : "text-zinc-500 dark:text-zinc-400"
                   }`}
                 >
-                  All
+                  All Routines <span className="opacity-70 font-mono">({routineCounts.all})</span>
                 </button>
                 <button
-                  onClick={() => setActiveFilter("daily")}
-                  className={`px-3 py-1 rounded-md text-label-md transition-all font-medium ${
-                    activeFilter === "daily"
-                      ? "bg-surface-container-lowest dark:bg-zinc-700 shadow-sm text-primary dark:text-white"
-                      : "text-on-surface-variant dark:text-zinc-400"
+                  onClick={() => setActiveRoutineFilter("morning")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 ${
+                    activeRoutineFilter === "morning"
+                      ? "bg-amber-500 text-white shadow-sm font-bold"
+                      : "text-zinc-500 dark:text-zinc-400"
                   }`}
                 >
-                  Daily
+                  <span>🌅 Morning</span>
+                  <span className="opacity-70 font-mono">({routineCounts.morning})</span>
                 </button>
                 <button
-                  onClick={() => setActiveFilter("weekly")}
-                  className={`px-3 py-1 rounded-md text-label-md transition-all font-medium ${
-                    activeFilter === "weekly"
-                      ? "bg-surface-container-lowest dark:bg-zinc-700 shadow-sm text-primary dark:text-white"
-                      : "text-on-surface-variant dark:text-zinc-400"
+                  onClick={() => setActiveRoutineFilter("afternoon")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 ${
+                    activeRoutineFilter === "afternoon"
+                      ? "bg-orange-500 text-white shadow-sm font-bold"
+                      : "text-zinc-500 dark:text-zinc-400"
                   }`}
                 >
-                  Weekly
+                  <span>☀️ Afternoon</span>
+                  <span className="opacity-70 font-mono">({routineCounts.afternoon})</span>
+                </button>
+                <button
+                  onClick={() => setActiveRoutineFilter("evening")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 ${
+                    activeRoutineFilter === "evening"
+                      ? "bg-indigo-600 text-white shadow-sm font-bold"
+                      : "text-zinc-500 dark:text-zinc-400"
+                  }`}
+                >
+                  <span>🌙 Evening</span>
+                  <span className="opacity-70 font-mono">({routineCounts.evening})</span>
                 </button>
               </div>
             </div>
 
-            {/* Habits Cards Checklist */}
+            {/* Frequency Sub-Filters */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setActiveFrequencyFilter("all")}
+                className={`text-xs px-3 py-1 rounded-full border transition ${
+                  activeFrequencyFilter === "all"
+                    ? "bg-zinc-800 text-white border-zinc-700"
+                    : "border-zinc-300 dark:border-zinc-800 text-zinc-500"
+                }`}
+              >
+                All Frequencies
+              </button>
+              <button
+                onClick={() => setActiveFrequencyFilter("daily")}
+                className={`text-xs px-3 py-1 rounded-full border transition ${
+                  activeFrequencyFilter === "daily"
+                    ? "bg-zinc-800 text-white border-zinc-700"
+                    : "border-zinc-300 dark:border-zinc-800 text-zinc-500"
+                }`}
+              >
+                Daily Only
+              </button>
+              <button
+                onClick={() => setActiveFrequencyFilter("weekly")}
+                className={`text-xs px-3 py-1 rounded-full border transition ${
+                  activeFrequencyFilter === "weekly"
+                    ? "bg-zinc-800 text-white border-zinc-700"
+                    : "border-zinc-300 dark:border-zinc-800 text-zinc-500"
+                }`}
+              >
+                Weekly Only
+              </button>
+            </div>
+
+            {/* Habits Checklist */}
             <div className="space-y-4">
               <AnimatePresence mode="popLayout">
                 {filteredHabits.length === 0 ? (
@@ -307,7 +391,7 @@ export default function DashboardPage() {
                     className="p-8 bg-surface-container-lowest dark:bg-zinc-900 border border-white dark:border-zinc-800 rounded-2xl text-center flex flex-col items-center gap-4"
                   >
                     <p className="text-on-surface-variant dark:text-zinc-400 text-body-md">
-                      No habits found for the selected filter.
+                      No habits found for the selected routine filter.
                     </p>
                     <Link
                       href="/habits/new"
@@ -338,12 +422,12 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Right Column: Insights & Trends */}
+          {/* Right Column: Insights & Quick Tips */}
           <aside className="space-y-gutter">
             {/* Weekly Activity Blocks */}
             <div className="bg-surface-container-lowest dark:bg-zinc-900 p-6 rounded-2xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] border border-white dark:border-zinc-800">
               <h3 className="font-display text-headline-md font-bold text-on-surface dark:text-white mb-6">
-                Weekly Activity
+                Weekly Consistency
               </h3>
               <div className="grid grid-cols-7 gap-2 mb-4">
                 {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => (
@@ -375,7 +459,7 @@ export default function DashboardPage() {
                 href="/analytics"
                 className="w-full mt-6 text-blue-600 dark:text-blue-400 font-semibold text-body-sm hover:underline flex items-center justify-center gap-1"
               >
-                <span>View Analytics</span>
+                <span>View Full Analytics & Heatmap</span>
                 <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
               </Link>
             </div>
@@ -384,40 +468,13 @@ export default function DashboardPage() {
             <div className="bg-primary-container p-6 rounded-2xl relative overflow-hidden group shadow-sm">
               <div className="relative z-10">
                 <span className="text-label-caps text-[#7c839b] font-mono tracking-wider text-[11px] mb-2 block">QUICK TIP</span>
-                <h4 className="text-headline-md font-bold text-white mb-3">Habit Stacking</h4>
+                <h4 className="text-headline-md font-bold text-white mb-3">Atomic Habits Rule</h4>
                 <p className="text-zinc-400 text-body-sm leading-relaxed">
-                  Try performing your new habit right after an existing, stable routine. Linking behaviors increases completion rates by 40%.
+                  Focus 1% better every day. Small consistent daily actions compound into massive long-term identity changes.
                 </p>
               </div>
               <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
                 <span className="material-symbols-outlined text-[120px] text-white select-none">tips_and_updates</span>
-              </div>
-            </div>
-
-            {/* Achievements/Goals */}
-            <div className="bg-surface-container-lowest dark:bg-zinc-900 p-6 rounded-2xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] border border-white dark:border-zinc-800">
-              <h3 className="font-display text-headline-md font-bold text-on-surface dark:text-white mb-4">
-                Upcoming Goals
-              </h3>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-surface-container dark:bg-zinc-800 flex items-center justify-center text-on-surface-variant dark:text-zinc-300">
-                    <span className="material-symbols-outlined text-[20px]">emoji_events</span>
-                  </div>
-                  <div>
-                    <p className="text-body-sm font-semibold text-on-surface dark:text-zinc-200">30 Day Water Challenge</p>
-                    <p className="text-label-md text-on-surface-variant dark:text-zinc-400">15 days remaining</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-surface-container dark:bg-zinc-800 flex items-center justify-center text-on-surface-variant dark:text-zinc-300">
-                    <span className="material-symbols-outlined text-[20px]">bedtime</span>
-                  </div>
-                  <div>
-                    <p className="text-body-sm font-semibold text-on-surface dark:text-zinc-200">Consistent Sleep Schedule</p>
-                    <p className="text-label-md text-on-surface-variant dark:text-zinc-400">Starts in 2 days</p>
-                  </div>
-                </div>
               </div>
             </div>
           </aside>

@@ -51,6 +51,9 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
+  const bgColor = useColorModeValue("gray.50", "gray.900");
+  const cardBgColor = useColorModeValue("white", "gray.800");
+
   useEffect(() => {
     if (!authLoading && user) {
       router.replace("/dashboard");
@@ -94,7 +97,7 @@ export default function SignupPage() {
         display="flex"
         alignItems="center"
         justifyContent="center"
-        bg={useColorModeValue("gray.50", "gray.900")}
+        bg={bgColor}
       >
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </Box>
@@ -107,7 +110,7 @@ export default function SignupPage() {
       display="flex"
       alignItems="center"
       justifyContent="center"
-      bg={useColorModeValue("gray.50", "gray.900")}
+      bg={bgColor}
       px={4}
     >
       <Stack spacing={8} mx="auto" maxW="lg" py={12} w="full">
@@ -120,7 +123,7 @@ export default function SignupPage() {
 
         <Box
           rounded="lg"
-          bg={useColorModeValue("white", "gray.800")}
+          bg={cardBgColor}
           boxShadow="lg"
           p={8}
         >

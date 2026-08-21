@@ -50,6 +50,9 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
+  const bgColor = useColorModeValue("gray.50", "gray.900");
+  const cardBgColor = useColorModeValue("white", "gray.800");
+
   useEffect(() => {
     if (!authLoading && user) {
       router.replace("/dashboard");
@@ -63,10 +66,11 @@ export default function LoginPage() {
 
     try {
       await signIn(email, password);
-      toast.success("Welcome back!");
-      router.push("/dashboard");
+      toast.success("Successfully logged in!");
+      router.replace("/dashboard");
     } catch (err: any) {
-      setError(err.message || "Failed to sign in");
+      setError(err?.message || "Failed to log in. Please check your credentials.");
+      toast.error(err?.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -77,10 +81,11 @@ export default function LoginPage() {
     setGoogleLoading(true);
     try {
       await signInWithGoogle();
-      toast.success("Welcome back!");
-      router.push("/dashboard");
+      toast.success("Successfully logged in with Google!");
+      router.replace("/dashboard");
     } catch (err: any) {
-      setError(err.message || "Failed to sign in with Google");
+      setError(err?.message || "Failed to sign in with Google.");
+      toast.error("Google sign in failed");
     } finally {
       setGoogleLoading(false);
     }
@@ -93,7 +98,7 @@ export default function LoginPage() {
         display="flex"
         alignItems="center"
         justifyContent="center"
-        bg={useColorModeValue("gray.50", "gray.900")}
+        bg={bgColor}
       >
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </Box>
@@ -106,7 +111,7 @@ export default function LoginPage() {
       display="flex"
       alignItems="center"
       justifyContent="center"
-      bg={useColorModeValue("gray.50", "gray.900")}
+      bg={bgColor}
       px={4}
     >
       <Stack spacing={8} mx="auto" maxW="lg" py={12} w="full">
@@ -119,7 +124,7 @@ export default function LoginPage() {
 
         <Box
           rounded="lg"
-          bg={useColorModeValue("white", "gray.800")}
+          bg={cardBgColor}
           boxShadow="lg"
           p={8}
         >

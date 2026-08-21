@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import toast from "react-hot-toast";
 import { useSearchStore } from "@/hooks/useSearchStore";
+import { ThemeToggle } from "./ThemeToggle";
 import { LogoIcon, LogoFull } from "./Logo";
 
 interface NavbarProps {
@@ -56,15 +57,32 @@ export function Navbar({ children }: NavbarProps) {
               <span className="material-symbols-outlined text-on-surface-variant dark:text-zinc-400 text-[20px]">search</span>
               <input
                 type="text"
-                placeholder="Search habits..."
+                placeholder="Search habits by name, routine, frequency..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent border-none focus:ring-0 text-body-sm w-full outline-none text-on-surface dark:text-zinc-100"
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setSearchQuery(val);
+                  if (val && pathname !== "/dashboard") {
+                    router.push("/dashboard");
+                  }
+                }}
+                className="bg-transparent border-none focus:ring-0 text-body-sm w-full outline-none text-on-surface dark:text-zinc-100 placeholder:text-zinc-400"
               />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="p-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-full transition text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                  title="Clear search"
+                >
+                  <span className="material-symbols-outlined text-[16px]">close</span>
+                </button>
+              )}
             </div>
           </div>
 
           <div className="flex items-center gap-4">
+            <ThemeToggle />
+
             <button className="material-symbols-outlined p-2 text-on-surface-variant dark:text-zinc-400 hover:bg-surface-container-low dark:hover:bg-zinc-800 rounded-full transition-colors">
               notifications
             </button>

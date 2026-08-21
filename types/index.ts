@@ -19,6 +19,9 @@ export interface Habit {
   icon: string;
   is_active: boolean;
   created_at: string;
+  target_value?: number;
+  target_unit?: string;
+  time_of_day?: "morning" | "afternoon" | "evening" | "anytime";
 }
 
 export interface HabitLog {
@@ -27,6 +30,7 @@ export interface HabitLog {
   date: string;
   status: "completed" | "missed";
   created_at: string;
+  value?: number;
 }
 
 export interface Category {
@@ -40,4 +44,25 @@ export interface StreakData {
   currentStreak: number;
   longestStreak: number;
   completionPercentage: number;
+}
+
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  unlocked: boolean;
+  unlockedAt?: string;
+  category: "streak" | "count" | "time" | "general";
+}
+
+export interface UserGamification {
+  xp: number;
+  level: number;
+  xpToNextLevel: number;
+  xpCurrentLevelProgress: number; // percentage 0-100
+  totalCompletions: number;
+  longestStreak: number;
+  currentStreak: number;
+  achievements: Achievement[];
 }

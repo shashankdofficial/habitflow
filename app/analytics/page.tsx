@@ -7,6 +7,7 @@ import { useHabits } from "@/hooks/useHabits";
 import { useQuery } from "@tanstack/react-query";
 import { getHabitLogs, calculateStreak } from "@/lib/habits";
 import { Navbar } from "@/components/Navbar";
+import { HeatmapGrid } from "@/components/HeatmapGrid";
 import { useSearchStore } from "@/hooks/useSearchStore";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { subDays, format, isSameDay, eachDayOfInterval } from "date-fns";
@@ -353,49 +354,7 @@ export default function AnalyticsPage() {
           </section>
 
           {/* Consistency Heatmap */}
-          <section className="bg-white dark:bg-zinc-900 border border-outline-variant/30 dark:border-zinc-800 p-6 md:p-8 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
-            <h2 className="font-display text-headline-md font-bold text-on-surface dark:text-white mb-1">
-              Consistency Heatmap
-            </h2>
-            <p className="text-on-surface-variant dark:text-zinc-400 text-body-sm mb-8">
-              Activity frequency across the last 12 weeks
-            </p>
-            
-            <div className="flex flex-wrap gap-2">
-              {heatmap.map((cell, idx) => {
-                let cellColor = "bg-slate-100 dark:bg-zinc-800 border border-slate-200/20";
-                if (cell.rate > 75) cellColor = "bg-blue-600";
-                else if (cell.rate > 50) cellColor = "bg-blue-400 dark:bg-blue-800/60";
-                else if (cell.rate > 25) cellColor = "bg-blue-200 dark:bg-blue-900/40";
-                else if (cell.rate > 0) cellColor = "bg-blue-50 dark:bg-blue-950/20";
-
-                return (
-                  <div
-                    key={idx}
-                    className={`w-6 h-6 rounded-md transition-all duration-300 hover:scale-125 hover:z-10 cursor-pointer ${cellColor}`}
-                    title={`${format(cell.date, "MMM d, yyyy")}: ${Math.round(cell.rate)}% completed`}
-                  ></div>
-                );
-              })}
-            </div>
-
-            <div className="mt-10 flex items-center gap-6">
-              <div className="flex flex-col">
-                <span className="text-[11px] text-on-surface-variant dark:text-zinc-400 font-mono uppercase tracking-wider mb-1">Most Active Day</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-headline-md font-semibold text-on-surface dark:text-zinc-100">{maxDay}</span>
-                  <span className="bg-blue-100 dark:bg-blue-950/80 text-blue-900 dark:text-blue-300 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tight">
-                    Prime Time
-                  </span>
-                </div>
-              </div>
-              <div className="h-10 w-[1px] bg-outline-variant dark:bg-zinc-800"></div>
-              <div className="flex flex-col">
-                <span className="text-[11px] text-on-surface-variant dark:text-zinc-400 font-mono uppercase tracking-wider mb-1">Least Active Day</span>
-                <span className="text-headline-md font-semibold text-on-surface dark:text-zinc-100">{minDay}</span>
-              </div>
-            </div>
-          </section>
+          <HeatmapGrid logs={allLogs} />
         </div>
 
         {/* Featured Insight Card */}
