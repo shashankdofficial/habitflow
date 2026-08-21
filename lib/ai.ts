@@ -1,4 +1,3 @@
-import { GoogleGenAI } from "@google/genai";
 import { Habit, HabitLog } from "@/types";
 
 export interface AICoachInsight {
@@ -19,8 +18,43 @@ export interface AIRecommendedHabit {
   icon: string;
 }
 
-const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
-const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const MODEL = "google/gemma-2-9b-it:free"; // Using Gemma-2 via OpenRouter as requested
+
+async function callOpenRouter(prompt: string): Promise<string | null> {
+  if (!OPENROUTER_API_KEY || OPENROUTER_API_KEY === "your_openrouter_api_key_here") {
+    return null;
+  }
+
+  try {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "http://localhost:3000",
+        "X-Title": "HabitFlow",
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [
+          { role: "user", content: prompt }
+        ],
+        response_format: { type: "json_object" } // Tell the model we want JSON
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenRouter API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content;
+  } catch (err) {
+    console.error("OpenRouter fetch error:", err);
+    return null;
+  }
+}
 
 export async function getAICoachInsights(habits: Habit[], logs: HabitLog[]): Promise<AICoachInsight> {
   const activeHabitsCount = habits.length;
@@ -40,36 +74,35 @@ export async function getAICoachInsights(habits: Habit[], logs: HabitLog[]): Pro
     };
   }
 
-  if (ai) {
-    try {
-      const prompt = `You are HabitFlow AI, an elite productivity coach.
+  const prompt = `You are HabitFlow AI, an elite productivity coach.
 Analyze these user habits & logs:
 Habits: ${JSON.stringify(habits.map((h) => ({ title: h.title, time: h.time_of_day, target: h.target_value })))}
 Total Check-ins Logged: ${totalCompletions}
 
-Return a JSON object with:
+Return ONLY a JSON object with this exact structure:
 {
   "headline": "Short snappy encouraging title",
   "summary": "1-2 sentence insights on performance and streak trends",
   "tips": ["Tip 1", "Tip 2", "Tip 3"],
   "suggestedAction": "Actionable focus for today"
 }
-ONLY valid JSON, no markdown codeblock tags.`;
+Do not include markdown codeblocks (\`\`\`json). Just return the raw JSON object.`;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-      });
+  const aiResponseText = await callOpenRouter(prompt);
 
-      const text = response.text || "";
-      const cleaned = text.replace(/```json/g, "").replace(/```/g, "").trim();
+  if (aiResponseText) {
+    try {
+      const cleaned = aiResponseText.replace(/```json/gi, "").replace(/```/g, "").trim();
       const parsed = JSON.parse(cleaned);
-      return parsed;
+      if (parsed.headline && parsed.summary) {
+        return parsed;
+      }
     } catch (err) {
-      console.warn("Gemini API call error, falling back to rule engine:", err);
+      console.warn("OpenRouter API parse error, falling back to rule engine:", err);
     }
   }
 
+  // Fallback Rule Engine
   if (totalCompletions < 5) {
     return {
       headline: "Building Foundation Mode 🎯",
@@ -96,30 +129,27 @@ ONLY valid JSON, no markdown codeblock tags.`;
 }
 
 export async function generateAIHabitSuggestions(userGoal: string): Promise<AIRecommendedHabit[]> {
-  if (ai) {
-    try {
-      const prompt = `A user wants habits for the goal: "${userGoal}".
+  const prompt = `A user wants habits for the goal: "${userGoal}".
 Generate 3 distinct, high-impact habit templates.
-Return a JSON array of objects with keys:
+Return ONLY a JSON array of objects with these exact keys:
 "title", "description", "frequency" ("daily" | "weekly"), "time_of_day" ("morning" | "afternoon" | "evening" | "anytime"), "target_value" (number or null), "target_unit" (string or null), "color" ("blue"|"green"|"purple"|"orange"|"pink"|"red"), "icon" ("water"|"fitness"|"self_improvement"|"book"|"sleep"|"work"|"food").
-ONLY valid JSON, no markdown codeblock tags.`;
+Do not include markdown codeblocks (\`\`\`json). Just return the raw JSON array.`;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-      });
+  const aiResponseText = await callOpenRouter(prompt);
 
-      const text = response.text || "";
-      const cleaned = text.replace(/```json/g, "").replace(/```/g, "").trim();
+  if (aiResponseText) {
+    try {
+      const cleaned = aiResponseText.replace(/```json/gi, "").replace(/```/g, "").trim();
       const parsed = JSON.parse(cleaned);
       if (Array.isArray(parsed) && parsed.length > 0) {
         return parsed;
       }
     } catch (err) {
-      console.warn("Gemini habit generation error, using fallback templates:", err);
+      console.warn("OpenRouter habit generation error, using fallback templates:", err);
     }
   }
 
+  // Fallback rules...
   const goalLower = userGoal.toLowerCase();
   if (goalLower.includes("fit") || goalLower.includes("health") || goalLower.includes("weight") || goalLower.includes("gym")) {
     return [
