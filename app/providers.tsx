@@ -3,6 +3,7 @@
 import { ChakraProvider, useColorMode } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
+import { AuthProvider } from "@/hooks/useAuth";
 
 function TailwindColorModeSync() {
   const { colorMode } = useColorMode();
@@ -22,9 +23,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ChakraProvider>
       <TailwindColorModeSync />
-      <QueryClientProvider client={queryClient}>
-        {children}
-      </QueryClientProvider>
+      <AuthProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </AuthProvider>
     </ChakraProvider>
   );
 }

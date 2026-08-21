@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -8,8 +8,28 @@ import {
   signInWithPopup,
   signOut as firebaseSignOut,
   onAuthStateChanged,
+  User as FirebaseUser,
 } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  photoURL: string | null;
+  user_metadata: {
+    name: string;
+  };
+  created_at: string;
+}
+
+interface AuthContextType {
+  user: AuthUser | null;
+  loading: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, name: string) => Promise<FirebaseUser | null>;
+  signInWithGoogle: () => Promise<FirebaseUser | null>;
+  signOut: () => Promise<void>;
+}
 
 const mapAuthError = (error: any): Error => {
   const code = error?.code;
@@ -40,6 +60,12 @@ const mapAuthError = (error: any): Error => {
     case "auth/popup-closed-by-user":
       message = "Sign-in popup closed before completion. Please try again.";
       break;
+    case "auth/cancelled-popup-request":
+      message = "Sign-in popup was cancelled. Please try again.";
+      break;
+    case "auth/popup-blocked":
+      message = "Sign-in popup was blocked by your browser. Please allow popups.";
+      break;
     default:
       if (error?.message) {
         message = error.message.replace(/^Firebase:\s*/, "");
@@ -49,8 +75,10 @@ const mapAuthError = (error: any): Error => {
   return new Error(message);
 };
 
-export function useAuth() {
-  const [user, setUser] = useState<any | null>(null);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -90,7 +118,7 @@ export function useAuth() {
         await updateProfile(userCredential.user, {
           displayName: name,
         });
-        
+
         setUser({
           id: userCredential.user.uid,
           email: userCredential.user.email || "",
@@ -110,7 +138,19 @@ export function useAuth() {
 
   const signInWithGoogle = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
+      const result = await signInWithPopup(auth, googleProvider);
+      if (result.user) {
+        setUser({
+          id: result.user.uid,
+          email: result.user.email || "",
+          photoURL: result.user.photoURL || null,
+          user_metadata: {
+            name: result.user.displayName || result.user.email?.split("@")[0] || "User",
+          },
+          created_at: result.user.metadata.creationTime || new Date().toISOString(),
+        });
+      }
+      return result.user;
     } catch (error) {
       console.error("Firebase Google Signin Error:", error);
       throw mapAuthError(error);
@@ -120,18 +160,33 @@ export function useAuth() {
   const signOut = async () => {
     try {
       await firebaseSignOut(auth);
+      setUser(null);
     } catch (error) {
       console.error("Firebase Signout Error:", error);
       throw error;
     }
   };
 
-  return {
-    user,
-    loading,
-    signIn,
-    signUp,
-    signInWithGoogle,
-    signOut,
-  };
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        signIn,
+        signUp,
+        signInWithGoogle,
+        signOut,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 }
