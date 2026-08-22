@@ -7,12 +7,14 @@ import { useAuth } from "../../context/AuthContext";
 import { useHabits } from "../../hooks/useHabits";
 import { getHabitLogs, calculateStreak } from "../../lib/habits";
 import { useQuery } from "@tanstack/react-query";
-import { User, LogOut, ChevronDown, ChevronUp, Bell, Shield, Moon, Save, KeyRound, Flame, CheckCircle2, Award } from "lucide-react-native";
+import { User, LogOut, Bell, Shield, Moon, Save, KeyRound, Flame, CheckCircle2, Award } from "lucide-react-native";
+import { useColorScheme } from "nativewind";
 
 export default function Settings() {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { habits } = useHabits(user?.uid);
+  const { colorScheme, setColorScheme } = useColorScheme();
 
   // Profile Form State
   const [name, setName] = useState("");
@@ -22,7 +24,6 @@ export default function Settings() {
   // Preference Toggles
   const [emailNotifs, setEmailNotifs] = useState(true);
   const [pushNotifs, setPushNotifs] = useState(true);
-  const [darkMode, setDarkMode] = useState(true);
 
   // Password Form State
   const [showPasswordForm, setShowPasswordForm] = useState(false);
@@ -34,6 +35,12 @@ export default function Settings() {
   const isPasswordUser = auth.currentUser
     ? auth.currentUser.providerData.some((prov) => prov.providerId === "password")
     : true;
+
+  const isDarkMode = colorScheme === "dark";
+
+  const handleToggleDarkMode = (val: boolean) => {
+    setColorScheme(val ? "dark" : "light");
+  };
 
   useEffect(() => {
     if (user) {
@@ -89,7 +96,7 @@ export default function Settings() {
         await updateProfile(auth.currentUser, {
           displayName: name.trim(),
         });
-        Alert.alert("Success", "Profile updated successfully!");
+        Alert.alert("Success 🎉", "Profile updated successfully!");
       } else {
         throw new Error("No active user session.");
       }
@@ -121,7 +128,7 @@ export default function Settings() {
         await reauthenticateWithCredential(auth.currentUser, credential);
         await updatePassword(auth.currentUser, newPassword);
         
-        Alert.alert("Success", "Password updated successfully!");
+        Alert.alert("Success 🎉", "Password updated successfully!");
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
@@ -150,61 +157,61 @@ export default function Settings() {
     .toUpperCase() || "US";
 
   return (
-    <View className="flex-1 bg-zinc-950" style={{ paddingTop: insets.top }}>
+    <View className="flex-1 bg-zinc-50 dark:bg-zinc-950" style={{ paddingTop: insets.top }}>
       <ScrollView className="flex-1 px-5" contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}>
         
         <View className="mt-4 mb-6">
-          <Text className="text-white text-3xl font-extrabold tracking-tight">Settings</Text>
-          <Text className="text-zinc-400 mt-1 text-sm">Manage your account and preferences ⚙️</Text>
+          <Text className="text-zinc-900 dark:text-white text-3xl font-extrabold tracking-tight">Settings</Text>
+          <Text className="text-zinc-500 dark:text-zinc-400 mt-1 text-sm">Manage your account and preferences ⚙️</Text>
         </View>
 
         {/* Profile Header Card */}
-        <View className="bg-zinc-900 border border-zinc-800 p-5 rounded-3xl mb-6 shadow-sm flex-row items-center">
-          <View className="w-16 h-16 bg-blue-600 rounded-full items-center justify-center mr-4 border-2 border-zinc-700">
+        <View className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-3xl mb-6 shadow-sm flex-row items-center">
+          <View className="w-16 h-16 bg-blue-600 rounded-full items-center justify-center mr-4 border-2 border-zinc-200 dark:border-zinc-700">
             <Text className="text-white font-bold text-xl">{initials}</Text>
           </View>
           <View className="flex-1">
-            <Text className="text-white font-bold text-lg" numberOfLines={1}>
+            <Text className="text-zinc-900 dark:text-white font-bold text-lg" numberOfLines={1}>
               {name || "User"}
             </Text>
-            <Text className="text-zinc-400 text-xs" numberOfLines={1}>{email}</Text>
-            <Text className="text-zinc-500 font-mono text-[10px] uppercase tracking-wider mt-1">
+            <Text className="text-zinc-500 dark:text-zinc-400 text-xs" numberOfLines={1}>{email}</Text>
+            <Text className="text-zinc-400 dark:text-zinc-500 font-mono text-[10px] uppercase tracking-wider mt-1">
               Member Account
             </Text>
           </View>
         </View>
 
         {/* Profile Information Section */}
-        <View className="bg-zinc-900 border border-zinc-800 p-5 rounded-3xl mb-6 shadow-sm">
+        <View className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-3xl mb-6 shadow-sm">
           <View className="flex-row items-center mb-4">
-            <User size={18} color="#60a5fa" style={{ marginRight: 8 }} />
-            <Text className="text-white font-bold text-base">Profile Information</Text>
+            <User size={18} color="#3b82f6" style={{ marginRight: 8 }} />
+            <Text className="text-zinc-900 dark:text-white font-bold text-base">Profile Information</Text>
           </View>
 
           <View className="mb-4">
-            <Text className="text-zinc-400 text-xs font-semibold mb-1.5">Display Name</Text>
+            <Text className="text-zinc-600 dark:text-zinc-400 text-xs font-semibold mb-1.5">Display Name</Text>
             <TextInput
               value={name}
               onChangeText={setName}
               placeholder="Enter your name"
-              placeholderTextColor="#71717a"
-              className="bg-zinc-950 border border-zinc-800 rounded-2xl px-4 py-3 text-white text-sm outline-none"
+              placeholderTextColor="#a1a1aa"
+              className="bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl px-4 py-3 text-zinc-900 dark:text-white text-sm outline-none"
             />
           </View>
 
           <View className="mb-5">
-            <Text className="text-zinc-400 text-xs font-semibold mb-1.5">Email Address</Text>
+            <Text className="text-zinc-600 dark:text-zinc-400 text-xs font-semibold mb-1.5">Email Address</Text>
             <TextInput
               value={email}
               editable={false}
-              className="bg-zinc-950/60 border border-zinc-800/60 rounded-2xl px-4 py-3 text-zinc-500 text-sm"
+              className="bg-zinc-100/60 dark:bg-zinc-950/60 border border-zinc-200 dark:border-zinc-800/60 rounded-2xl px-4 py-3 text-zinc-400 dark:text-zinc-500 text-sm"
             />
           </View>
 
           <TouchableOpacity
             onPress={handleSaveProfile}
             disabled={isSavingProfile}
-            className="bg-blue-600 py-3 rounded-2xl flex-row items-center justify-center"
+            className="bg-blue-600 py-3 rounded-2xl flex-row items-center justify-center shadow-md"
           >
             {isSavingProfile ? (
               <ActivityIndicator size="small" color="#fff" />
@@ -218,127 +225,127 @@ export default function Settings() {
         </View>
 
         {/* Notifications Section */}
-        <View className="bg-zinc-900 border border-zinc-800 p-5 rounded-3xl mb-6 shadow-sm">
+        <View className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-3xl mb-6 shadow-sm">
           <View className="flex-row items-center mb-4">
-            <Bell size={18} color="#60a5fa" style={{ marginRight: 8 }} />
-            <Text className="text-white font-bold text-base">Notifications</Text>
+            <Bell size={18} color="#3b82f6" style={{ marginRight: 8 }} />
+            <Text className="text-zinc-900 dark:text-white font-bold text-base">Notifications</Text>
           </View>
 
-          <View className="flex-row items-center justify-between py-3 border-b border-zinc-800/80">
+          <View className="flex-row items-center justify-between py-3 border-b border-zinc-200 dark:border-zinc-800/80">
             <View>
-              <Text className="text-zinc-200 font-medium text-sm">Email Notifications</Text>
-              <Text className="text-zinc-400 text-xs mt-0.5">Daily reminders & updates</Text>
+              <Text className="text-zinc-800 dark:text-zinc-200 font-medium text-sm">Email Notifications</Text>
+              <Text className="text-zinc-500 dark:text-zinc-400 text-xs mt-0.5">Daily reminders & updates</Text>
             </View>
             <Switch
               value={emailNotifs}
               onValueChange={setEmailNotifs}
-              trackColor={{ false: "#27272a", true: "#3b82f6" }}
+              trackColor={{ false: "#d4d4d8", true: "#3b82f6" }}
               thumbColor="#fff"
             />
           </View>
 
           <View className="flex-row items-center justify-between pt-3">
             <View>
-              <Text className="text-zinc-200 font-medium text-sm">Push Notifications</Text>
-              <Text className="text-zinc-400 text-xs mt-0.5">Habit check-in prompts</Text>
+              <Text className="text-zinc-800 dark:text-zinc-200 font-medium text-sm">Push Notifications</Text>
+              <Text className="text-zinc-500 dark:text-zinc-400 text-xs mt-0.5">Habit check-in prompts</Text>
             </View>
             <Switch
               value={pushNotifs}
               onValueChange={setPushNotifs}
-              trackColor={{ false: "#27272a", true: "#3b82f6" }}
+              trackColor={{ false: "#d4d4d8", true: "#3b82f6" }}
               thumbColor="#fff"
             />
           </View>
         </View>
 
         {/* Appearance Section */}
-        <View className="bg-zinc-900 border border-zinc-800 p-5 rounded-3xl mb-6 shadow-sm">
+        <View className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-3xl mb-6 shadow-sm">
           <View className="flex-row items-center mb-4">
-            <Moon size={18} color="#60a5fa" style={{ marginRight: 8 }} />
-            <Text className="text-white font-bold text-base">Appearance</Text>
+            <Moon size={18} color="#3b82f6" style={{ marginRight: 8 }} />
+            <Text className="text-zinc-900 dark:text-white font-bold text-base">Appearance</Text>
           </View>
 
           <View className="flex-row items-center justify-between">
             <View>
-              <Text className="text-zinc-200 font-medium text-sm">Dark Mode</Text>
-              <Text className="text-zinc-400 text-xs mt-0.5">Optimized dark theme</Text>
+              <Text className="text-zinc-800 dark:text-zinc-200 font-medium text-sm">Dark Mode</Text>
+              <Text className="text-zinc-500 dark:text-zinc-400 text-xs mt-0.5">Toggle theme ({isDarkMode ? "Dark" : "Light"})</Text>
             </View>
             <Switch
-              value={darkMode}
-              onValueChange={setDarkMode}
-              trackColor={{ false: "#27272a", true: "#3b82f6" }}
+              value={isDarkMode}
+              onValueChange={handleToggleDarkMode}
+              trackColor={{ false: "#d4d4d8", true: "#3b82f6" }}
               thumbColor="#fff"
             />
           </View>
         </View>
 
         {/* Account & Security Section */}
-        <View className="bg-zinc-900 border border-zinc-800 p-5 rounded-3xl mb-6 shadow-sm">
+        <View className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-3xl mb-6 shadow-sm">
           <View className="flex-row items-center justify-between mb-2">
             <View className="flex-row items-center">
-              <Shield size={18} color="#60a5fa" style={{ marginRight: 8 }} />
-              <Text className="text-white font-bold text-base">Account & Security</Text>
+              <Shield size={18} color="#3b82f6" style={{ marginRight: 8 }} />
+              <Text className="text-zinc-900 dark:text-white font-bold text-base">Account & Security</Text>
             </View>
             {isPasswordUser ? (
               <TouchableOpacity 
                 onPress={() => setShowPasswordForm(!showPasswordForm)}
-                className="flex-row items-center bg-zinc-800 px-3 py-1.5 rounded-xl"
+                className="flex-row items-center bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700"
               >
-                <KeyRound size={14} color="#94a3b8" style={{ marginRight: 4 }} />
-                <Text className="text-zinc-300 text-xs font-semibold">Change Password</Text>
+                <KeyRound size={14} color="#71717a" style={{ marginRight: 4 }} />
+                <Text className="text-zinc-700 dark:text-zinc-300 text-xs font-semibold">Change Password</Text>
               </TouchableOpacity>
             ) : null}
           </View>
 
           {!isPasswordUser && (
-            <Text className="text-zinc-400 text-xs mt-1">
+            <Text className="text-zinc-500 dark:text-zinc-400 text-xs mt-1">
               Your account is signed in via Google OAuth. Password management is handled by Google.
             </Text>
           )}
 
           {/* Expandable Password Form */}
           {showPasswordForm && isPasswordUser && (
-            <View className="mt-4 pt-4 border-t border-zinc-800">
+            <View className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
               <View className="mb-3">
-                <Text className="text-zinc-400 text-xs font-semibold mb-1">Current Password</Text>
+                <Text className="text-zinc-600 dark:text-zinc-400 text-xs font-semibold mb-1">Current Password</Text>
                 <TextInput
                   value={currentPassword}
                   onChangeText={setCurrentPassword}
                   secureTextEntry
                   placeholder="Enter current password"
-                  placeholderTextColor="#71717a"
-                  className="bg-zinc-950 border border-zinc-800 rounded-2xl px-4 py-2.5 text-white text-sm"
+                  placeholderTextColor="#a1a1aa"
+                  className="bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl px-4 py-2.5 text-zinc-900 dark:text-white text-sm"
                 />
               </View>
 
               <View className="mb-3">
-                <Text className="text-zinc-400 text-xs font-semibold mb-1">New Password</Text>
+                <Text className="text-zinc-600 dark:text-zinc-400 text-xs font-semibold mb-1">New Password</Text>
                 <TextInput
                   value={newPassword}
                   onChangeText={setNewPassword}
                   secureTextEntry
                   placeholder="At least 6 characters"
-                  placeholderTextColor="#71717a"
-                  className="bg-zinc-950 border border-zinc-800 rounded-2xl px-4 py-2.5 text-white text-sm"
+                  placeholderTextColor="#a1a1aa"
+                  className="bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl px-4 py-2.5 text-zinc-900 dark:text-white text-sm"
                 />
               </View>
 
               <View className="mb-4">
-                <Text className="text-zinc-400 text-xs font-semibold mb-1">Confirm New Password</Text>
+                <Text className="text-zinc-600 dark:text-zinc-400 text-xs font-semibold mb-1">Confirm New Password</Text>
                 <TextInput
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                   secureTextEntry
                   placeholder="Re-enter new password"
-                  placeholderTextColor="#71717a"
-                  className="bg-zinc-950 border border-zinc-800 rounded-2xl px-4 py-2.5 text-white text-sm"
+                  placeholderTextColor="#a1a1aa"
+                  className="bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl px-4 py-2.5 text-zinc-900 dark:text-white text-sm"
                 />
               </View>
 
               <TouchableOpacity
                 onPress={handleUpdatePassword}
                 disabled={isUpdatingPassword}
-                className="bg-blue-600 py-2.5 rounded-2xl items-center"
+                className="bg-blue-600 py-2.5 rounded-2xl items-center shadow-sm"
               >
                 {isUpdatingPassword ? (
                   <ActivityIndicator size="small" color="#fff" />
@@ -352,22 +359,22 @@ export default function Settings() {
 
         {/* Stats Summary Footer */}
         <View className="flex-row justify-between gap-2 mb-6">
-          <View className="flex-1 bg-zinc-900 border border-zinc-800 p-3 rounded-2xl items-center">
+          <View className="flex-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 rounded-2xl items-center shadow-sm">
             <Flame size={16} color="#f97316" />
             <Text className="text-zinc-500 font-mono text-[9px] uppercase mt-1">Streak</Text>
-            <Text className="text-white font-bold text-base mt-0.5">{maxStreak} Days</Text>
+            <Text className="text-zinc-900 dark:text-white font-bold text-base mt-0.5">{maxStreak} Days</Text>
           </View>
 
-          <View className="flex-1 bg-zinc-900 border border-zinc-800 p-3 rounded-2xl items-center">
+          <View className="flex-1 bg-white dark:bg-zinc-900 border border-zinc-800 p-3 rounded-2xl items-center shadow-sm">
             <CheckCircle2 size={16} color="#3b82f6" />
             <Text className="text-zinc-500 font-mono text-[9px] uppercase mt-1">Completed</Text>
-            <Text className="text-white font-bold text-base mt-0.5">{totalCompletedCount}</Text>
+            <Text className="text-zinc-900 dark:text-white font-bold text-base mt-0.5">{totalCompletedCount}</Text>
           </View>
 
-          <View className="flex-1 bg-zinc-900 border border-zinc-800 p-3 rounded-2xl items-center">
+          <View className="flex-1 bg-white dark:bg-zinc-900 border border-zinc-800 p-3 rounded-2xl items-center shadow-sm">
             <Award size={16} color="#eab308" />
             <Text className="text-zinc-500 font-mono text-[9px] uppercase mt-1">Rank</Text>
-            <Text className="text-white font-bold text-base mt-0.5">{rank}</Text>
+            <Text className="text-zinc-900 dark:text-white font-bold text-base mt-0.5">{rank}</Text>
           </View>
         </View>
 
@@ -377,7 +384,7 @@ export default function Settings() {
           className="bg-red-500/10 border border-red-500/30 p-4 rounded-2xl flex-row items-center justify-center mb-6"
         >
           <LogOut size={18} color="#ef4444" style={{ marginRight: 8 }} />
-          <Text className="text-red-400 font-bold text-base">Sign Out</Text>
+          <Text className="text-red-500 font-bold text-base">Sign Out</Text>
         </TouchableOpacity>
 
       </ScrollView>
