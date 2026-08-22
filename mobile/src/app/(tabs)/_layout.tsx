@@ -8,13 +8,16 @@ import { useTodayHabits } from "../../hooks/useHabits";
 import { calculateUserGamification } from "../../lib/habits";
 import { signOut } from "firebase/auth";
 import { auth } from "../../lib/firebase";
+import { useColorScheme } from "nativewind";
 
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { user } = useAuth();
+  const { colorScheme } = useColorScheme();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+  const isDark = colorScheme === "dark";
   const { todayHabits, allLogs } = useTodayHabits(user?.uid);
   const gamification = calculateUserGamification(todayHabits, allLogs);
 
@@ -33,14 +36,19 @@ export default function TabsLayout() {
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: "#09090b", // dark slate/zinc
-            borderTopColor: "#27272a",
-            paddingBottom: insets.bottom > 0 ? insets.bottom - 5 : 8,
-            paddingTop: 8,
-            height: 62 + (insets.bottom > 0 ? insets.bottom : 0),
+            backgroundColor: isDark ? "#09090b" : "#ffffff",
+            borderTopColor: isDark ? "#27272a" : "#e4e4e7",
+            paddingBottom: insets.bottom > 0 ? insets.bottom - 4 : 6,
+            paddingTop: 6,
+            height: 64 + (insets.bottom > 0 ? insets.bottom : 0),
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: isDark ? 0.3 : 0.05,
+            shadowRadius: 8,
+            elevation: 8,
           },
           tabBarActiveTintColor: "#3b82f6",
-          tabBarInactiveTintColor: "#a1a1aa",
+          tabBarInactiveTintColor: isDark ? "#a1a1aa" : "#71717a",
         }}
       >
         <Tabs.Screen
@@ -62,8 +70,14 @@ export default function TabsLayout() {
           options={{
             title: "",
             tabBarIcon: () => (
-              <View className="w-12 h-12 rounded-full bg-blue-600 items-center justify-center -mt-5 shadow-lg border-4 border-zinc-950">
-                <Plus size={24} color="#ffffff" strokeWidth={3} />
+              <View className="items-center justify-center -mt-7">
+                {/* Outer Curved Dock Circle */}
+                <View className="w-16 h-16 rounded-full bg-zinc-50 dark:bg-zinc-950 items-center justify-center shadow-lg border border-zinc-200/50 dark:border-zinc-800/50">
+                  {/* Inner Glowing Plus Button */}
+                  <View className="w-13 h-13 rounded-full bg-blue-600 items-center justify-center shadow-md shadow-blue-500/50">
+                    <Plus size={28} color="#ffffff" strokeWidth={2.5} />
+                  </View>
+                </View>
               </View>
             ),
           }}
@@ -91,7 +105,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="analytics"
           options={{
-            href: null, // Hidden tab route accessible from drawer
+            href: null,
           }}
         />
       </Tabs>
@@ -104,37 +118,35 @@ export default function TabsLayout() {
         onRequestClose={() => setIsDrawerOpen(false)}
       >
         <View className="flex-1 bg-black/60 flex-row justify-end">
-          {/* Backdrop Tap Area */}
           <TouchableOpacity 
             className="flex-1" 
             activeOpacity={1} 
             onPress={() => setIsDrawerOpen(false)} 
           />
 
-          {/* Sliding Side Drawer Content */}
           <View 
-            className="w-4/5 max-w-[320px] bg-zinc-900 h-full border-l border-zinc-800 p-6 flex-col justify-between"
+            className="w-4/5 max-w-[320px] bg-white dark:bg-zinc-900 h-full border-l border-zinc-200 dark:border-zinc-800 p-6 flex-col justify-between"
             style={{ paddingTop: insets.top + 20, paddingBottom: insets.bottom + 20 }}
           >
             <View>
               {/* Drawer Header */}
-              <View className="flex-row items-center justify-between mb-8 pb-4 border-b border-zinc-800">
+              <View className="flex-row items-center justify-between mb-8 pb-4 border-b border-zinc-200 dark:border-zinc-800">
                 <View>
-                  <Text className="text-white font-bold text-lg">Menu & Navigation</Text>
-                  <Text className="text-zinc-400 text-xs">{user?.email}</Text>
+                  <Text className="text-zinc-900 dark:text-white font-bold text-lg">Menu & Navigation</Text>
+                  <Text className="text-zinc-500 dark:text-zinc-400 text-xs">{user?.email}</Text>
                 </View>
-                <TouchableOpacity onPress={() => setIsDrawerOpen(false)} className="p-2 bg-zinc-800 rounded-full">
-                  <X size={18} color="#a1a1aa" />
+                <TouchableOpacity onPress={() => setIsDrawerOpen(false)} className="p-2 bg-zinc-100 dark:bg-zinc-800 rounded-full">
+                  <X size={18} color={isDark ? "#a1a1aa" : "#71717a"} />
                 </TouchableOpacity>
               </View>
 
-              {/* User Rank Card in Drawer */}
-              <View className="bg-zinc-950 border border-zinc-800 p-4 rounded-2xl mb-6">
+              {/* User Rank Card */}
+              <View className="bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-4 rounded-2xl mb-6">
                 <View className="flex-row items-center mb-2">
                   <Trophy size={16} color="#eab308" style={{ marginRight: 6 }} />
-                  <Text className="text-white font-bold text-sm">Level {gamification.level} Rank</Text>
+                  <Text className="text-zinc-900 dark:text-white font-bold text-sm">Level {gamification.level} Rank</Text>
                 </View>
-                <Text className="text-yellow-500 font-bold text-xs">{gamification.xp} XP Earned</Text>
+                <Text className="text-yellow-600 dark:text-yellow-500 font-bold text-xs">{gamification.xp} XP Earned</Text>
               </View>
 
               {/* Drawer Links */}
@@ -144,14 +156,14 @@ export default function TabsLayout() {
                     setIsDrawerOpen(false);
                     router.push("/(tabs)/analytics");
                   }}
-                  className="flex-row items-center p-3 bg-zinc-800/60 rounded-2xl border border-zinc-800 mb-3"
+                  className="flex-row items-center p-3.5 bg-zinc-50 dark:bg-zinc-800/60 rounded-2xl border border-zinc-200 dark:border-zinc-800 mb-3"
                 >
                   <View className="p-2 bg-blue-500/20 rounded-xl mr-3">
-                    <BarChart3 size={18} color="#60a5fa" />
+                    <BarChart3 size={18} color="#3b82f6" />
                   </View>
                   <View>
-                    <Text className="text-white font-semibold text-sm">Analytics Dashboard</Text>
-                    <Text className="text-zinc-400 text-xs">Charts & habit performance</Text>
+                    <Text className="text-zinc-900 dark:text-white font-semibold text-sm">Analytics Dashboard</Text>
+                    <Text className="text-zinc-500 dark:text-zinc-400 text-xs">Charts & habit performance</Text>
                   </View>
                 </TouchableOpacity>
 
@@ -160,26 +172,26 @@ export default function TabsLayout() {
                     setIsDrawerOpen(false);
                     router.push("/(tabs)/settings");
                   }}
-                  className="flex-row items-center p-3 bg-zinc-800/60 rounded-2xl border border-zinc-800 mb-3"
+                  className="flex-row items-center p-3.5 bg-zinc-50 dark:bg-zinc-800/60 rounded-2xl border border-zinc-200 dark:border-zinc-800 mb-3"
                 >
                   <View className="p-2 bg-purple-500/20 rounded-xl mr-3">
-                    <SettingsIcon size={18} color="#c084fc" />
+                    <SettingsIcon size={18} color="#a855f7" />
                   </View>
                   <View>
-                    <Text className="text-white font-semibold text-sm">Account Settings</Text>
-                    <Text className="text-zinc-400 text-xs">Profile, theme & password</Text>
+                    <Text className="text-zinc-900 dark:text-white font-semibold text-sm">Account Settings</Text>
+                    <Text className="text-zinc-500 dark:text-zinc-400 text-xs">Profile, theme & password</Text>
                   </View>
                 </TouchableOpacity>
               </View>
             </View>
 
-            {/* Sign Out Button in Drawer */}
+            {/* Sign Out */}
             <TouchableOpacity
               onPress={handleSignOut}
               className="bg-red-500/10 border border-red-500/30 p-3.5 rounded-2xl flex-row items-center justify-center"
             >
               <LogOut size={16} color="#ef4444" style={{ marginRight: 8 }} />
-              <Text className="text-red-400 font-bold text-sm">Sign Out</Text>
+              <Text className="text-red-500 font-bold text-sm">Sign Out</Text>
             </TouchableOpacity>
 
           </View>

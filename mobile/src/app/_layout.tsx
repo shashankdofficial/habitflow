@@ -6,6 +6,8 @@ import { AuthProvider, useAuth } from "../context/AuthContext";
 import { useEffect } from "react";
 import { View, ActivityIndicator } from "react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SearchProvider } from "../context/SearchContext";
+import { useColorScheme } from "nativewind";
 
 const queryClient = new QueryClient();
 
@@ -13,6 +15,9 @@ function InitialLayout() {
   const { user, loading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+  const { colorScheme } = useColorScheme();
+
+  const isDark = colorScheme === "dark";
 
   useEffect(() => {
     if (loading) return;
@@ -21,27 +26,27 @@ function InitialLayout() {
     const inTabsGroup = segments[0] === "(tabs)";
 
     if (user && !inTabsGroup) {
-      // If user is signed in and not in tabs, redirect to dashboard
       router.replace("/(tabs)");
-    } else if (!user && !inAuthGroup && segments.length > 0 && segments[0] !== "") {
-      // If user is not signed in and trying to access restricted screens, redirect to login
-      // We allow them to stay on the index ("") screen.
+    } else if (!user && !inAuthGroup && segments.length > 0 && (segments[0] as string) !== "") {
       router.replace("/(auth)/login");
     }
   }, [user, loading, segments]);
 
   if (loading) {
     return (
-      <View className="flex-1 bg-zinc-950 items-center justify-center">
-        <ActivityIndicator size="large" color="#60a5fa" />
+      <View className={`flex-1 items-center justify-center ${isDark ? "dark bg-zinc-950" : "bg-zinc-50"}`}>
+        <ActivityIndicator size="large" color="#3b82f6" />
       </View>
     );
   }
 
-  return <Slot />;
+  return (
+    <View className={`flex-1 ${isDark ? "dark bg-zinc-950" : "bg-zinc-50"}`}>
+      <StatusBar style={isDark ? "light" : "dark"} />
+      <Slot />
+    </View>
+  );
 }
-
-import { SearchProvider } from "../context/SearchContext";
 
 export default function RootLayout() {
   return (
@@ -49,7 +54,6 @@ export default function RootLayout() {
       <AuthProvider>
         <SearchProvider>
           <SafeAreaProvider>
-            <StatusBar style="light" />
             <InitialLayout />
           </SafeAreaProvider>
         </SearchProvider>

@@ -89,103 +89,103 @@ export default function Analytics() {
   });
 
   return (
-    <View className="flex-1 bg-zinc-950" style={{ paddingTop: insets.top }}>
+    <View className="flex-1 bg-zinc-50 dark:bg-zinc-950" style={{ paddingTop: insets.top }}>
       <ScrollView className="flex-1 px-5" contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}>
         
         {/* Global Search Bar */}
         <View className="mt-4 mb-4">
-          <View className="flex-row items-center bg-zinc-900 border border-zinc-800 rounded-2xl px-4 py-2.5">
+          <View className="flex-row items-center bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl px-4 py-2.5 shadow-sm">
             <Search size={18} color="#71717a" style={{ marginRight: 8 }} />
             <TextInput
               value={searchQuery}
               onChangeText={setSearchQuery}
               placeholder="Search analytics..."
-              placeholderTextColor="#71717a"
-              className="flex-1 text-white text-sm py-1 outline-none"
+              placeholderTextColor="#a1a1aa"
+              className="flex-1 text-zinc-900 dark:text-white text-sm py-1 outline-none"
             />
             {searchQuery ? (
               <TouchableOpacity onPress={() => setSearchQuery("")}>
-                <X size={16} color="#a1a1aa" />
+                <X size={16} color="#71717a" />
               </TouchableOpacity>
             ) : null}
           </View>
         </View>
 
         <View className="mb-6">
-          <Text className="text-white text-3xl font-extrabold tracking-tight">Analytics</Text>
-          <Text className="text-zinc-400 mt-1 text-sm">Track your progress and mastery 📊</Text>
+          <Text className="text-zinc-900 dark:text-white text-3xl font-extrabold tracking-tight">Analytics</Text>
+          <Text className="text-zinc-500 dark:text-zinc-400 mt-1 text-sm">Track your progress and mastery 📊</Text>
         </View>
 
         {isLoading ? (
           <View className="flex-1 items-center justify-center py-20">
-            <ActivityIndicator size="large" color="#60a5fa" />
+            <ActivityIndicator size="large" color="#3b82f6" />
           </View>
         ) : habits.length === 0 ? (
-          <View className="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl items-center shadow-xl">
+          <View className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-8 rounded-3xl items-center shadow-sm">
             <TrendingUp size={32} color="#71717a" />
-            <Text className="text-zinc-300 text-center text-lg font-semibold mt-4 mb-2">No data yet</Text>
+            <Text className="text-zinc-800 dark:text-zinc-300 text-center text-lg font-semibold mt-4 mb-2">No data yet</Text>
             <Text className="text-zinc-500 text-center text-sm">Check-in to your habits to generate analytics!</Text>
           </View>
         ) : (
           <View>
             {/* Bento Grid High Level Metrics */}
             <View className="flex-row flex-wrap justify-between gap-2.5 mb-6">
-              <View className="w-[48%] bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-sm mb-1">
-                <Text className="text-zinc-400 text-[10px] uppercase font-mono tracking-wider mb-2">Total Habits</Text>
+              <View className="w-[48%] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 shadow-sm mb-1">
+                <Text className="text-zinc-500 dark:text-zinc-400 text-[10px] uppercase font-mono tracking-wider mb-2">Total Habits</Text>
                 <View className="flex-row items-center justify-between">
-                  <Text className="text-white text-3xl font-bold">{habits.length}</Text>
+                  <Text className="text-zinc-900 dark:text-white text-3xl font-bold">{habits.length}</Text>
                   <Target size={20} color="#3b82f6" />
                 </View>
               </View>
 
-              <View className="w-[48%] bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-sm mb-1">
-                <Text className="text-zinc-400 text-[10px] uppercase font-mono tracking-wider mb-2">Total Check-ins</Text>
+              <View className="w-[48%] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 shadow-sm mb-1">
+                <Text className="text-zinc-500 dark:text-zinc-400 text-[10px] uppercase font-mono tracking-wider mb-2">Total Check-ins</Text>
                 <View className="flex-row items-center justify-between">
-                  <Text className="text-white text-3xl font-bold">{totalCheckInsCount}</Text>
+                  <Text className="text-zinc-900 dark:text-white text-3xl font-bold">{totalCheckInsCount}</Text>
                   <CheckCircle2 size={20} color="#22c55e" />
                 </View>
               </View>
 
-              <View className="w-[48%] bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-sm">
-                <Text className="text-zinc-400 text-[10px] uppercase font-mono tracking-wider mb-2">Avg. Completion</Text>
+              <View className="w-[48%] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 shadow-sm">
+                <Text className="text-zinc-500 dark:text-zinc-400 text-[10px] uppercase font-mono tracking-wider mb-2">Avg. Completion</Text>
                 <View className="flex-row items-center justify-between">
-                  <Text className="text-white text-3xl font-bold">{avgCompletionRate}%</Text>
+                  <Text className="text-zinc-900 dark:text-white text-3xl font-bold">{avgCompletionRate}%</Text>
                   <TrendingUp size={20} color="#eab308" />
                 </View>
               </View>
 
-              <View className="w-[48%] bg-blue-950/40 border border-blue-900/60 rounded-2xl p-4 shadow-sm">
-                <Text className="text-blue-300 text-[10px] uppercase font-mono tracking-wider mb-2">Longest Streak</Text>
+              <View className="w-[48%] bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/60 rounded-2xl p-4 shadow-sm">
+                <Text className="text-blue-600 dark:text-blue-300 text-[10px] uppercase font-mono tracking-wider mb-2">Longest Streak</Text>
                 <View className="flex-row items-center justify-between">
-                  <Text className="text-white text-3xl font-bold">{maxStreak}</Text>
+                  <Text className="text-zinc-900 dark:text-white text-3xl font-bold">{maxStreak}</Text>
                   <Flame size={20} color="#f97316" />
                 </View>
               </View>
             </View>
 
             {/* Weekly Completion Bar Chart */}
-            <View className="bg-zinc-900 border border-zinc-800 rounded-3xl p-5 mb-6 shadow-sm">
-              <Text className="text-white text-lg font-bold mb-1">Weekly Completion</Text>
-              <Text className="text-zinc-400 text-xs mb-6">Last 7 days consistency rate</Text>
+            <View className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 mb-6 shadow-sm">
+              <Text className="text-zinc-900 dark:text-white text-lg font-bold mb-1">Weekly Completion</Text>
+              <Text className="text-zinc-500 dark:text-zinc-400 text-xs mb-6">Last 7 days consistency rate</Text>
               
               <View className="flex-row justify-between items-end h-32 px-2">
                 {weeklyData.map((day, idx) => (
                   <View key={idx} className="items-center w-[12%]">
                     <View className="w-full h-24 justify-end">
                       <View 
-                        className="w-full bg-blue-500 rounded-t-md" 
+                        className="w-full bg-blue-600 rounded-t-md" 
                         style={{ height: `${Math.max(day.completion, 5)}%` }}
                       />
                     </View>
-                    <Text className="text-zinc-400 text-xs mt-2">{day.dayName}</Text>
+                    <Text className="text-zinc-500 dark:text-zinc-400 text-xs mt-2">{day.dayName}</Text>
                   </View>
                 ))}
               </View>
             </View>
 
             {/* Habit Performance List */}
-            <View className="bg-zinc-900 border border-zinc-800 rounded-3xl p-5 mb-6 shadow-sm">
-              <Text className="text-white text-lg font-bold mb-5">Habit Performance</Text>
+            <View className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 mb-6 shadow-sm">
+              <Text className="text-zinc-900 dark:text-white text-lg font-bold mb-5">Habit Performance</Text>
               
               {habitPerformance.length === 0 ? (
                 <Text className="text-zinc-500 text-xs">No habits match search query.</Text>
@@ -194,17 +194,17 @@ export default function Analytics() {
                   <View key={habit.id} className="mb-4">
                     <View className="flex-row justify-between items-center mb-1.5">
                       <View className="flex-row items-center flex-1 mr-2">
-                        <View className="bg-zinc-800 w-8 h-8 rounded-lg items-center justify-center mr-3">
-                          <Text className="text-white font-bold text-xs">{habit.title.slice(0, 2).toUpperCase()}</Text>
+                        <View className="bg-zinc-100 dark:bg-zinc-800 w-8 h-8 rounded-lg items-center justify-center mr-3">
+                          <Text className="text-zinc-900 dark:text-white font-bold text-xs">{habit.title.slice(0, 2).toUpperCase()}</Text>
                         </View>
-                        <Text className="text-white font-semibold text-sm truncate flex-1" numberOfLines={1}>{habit.title}</Text>
+                        <Text className="text-zinc-900 dark:text-white font-semibold text-sm truncate flex-1" numberOfLines={1}>{habit.title}</Text>
                       </View>
-                      <Text className="text-blue-400 font-bold text-xs">{habit.completionRate}% Rate</Text>
+                      <Text className="text-blue-600 dark:text-blue-400 font-bold text-xs">{habit.completionRate}% Rate</Text>
                     </View>
                     
-                    <View className="w-full h-2 bg-zinc-800 rounded-full mb-1 overflow-hidden">
+                    <View className="w-full h-2 bg-zinc-200 dark:bg-zinc-800 rounded-full mb-1 overflow-hidden">
                       <View 
-                        className="h-full bg-blue-500 rounded-full" 
+                        className="h-full bg-blue-600 rounded-full" 
                         style={{ width: `${habit.completionRate}%` }}
                       />
                     </View>

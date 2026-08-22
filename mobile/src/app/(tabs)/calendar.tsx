@@ -6,7 +6,7 @@ import { useHabits } from "../../hooks/useHabits";
 import { getHabitLogs, calculateStreak } from "../../lib/habits";
 import { useQuery } from "@tanstack/react-query";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, subMonths, addMonths, subDays } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Flame, CheckCircle2, Search, X } from "lucide-react-native";
+import { ChevronLeft, ChevronRight, Flame, CheckCircle2, Search, X } from "lucide-react-native";
 import { useSearch } from "../../context/SearchContext";
 
 export default function Calendar() {
@@ -79,10 +79,10 @@ export default function Calendar() {
 
   const getHeatmapBg = (day: Date) => {
     const { percentage, total } = getCompletionDataForDay(day);
-    if (total === 0 || percentage === 0) return "bg-zinc-900 border-zinc-800";
-    if (percentage < 25) return "bg-blue-950/40 border-blue-900/50";
-    if (percentage < 50) return "bg-blue-900/60 border-blue-800";
-    if (percentage < 100) return "bg-blue-800 border-blue-700";
+    if (total === 0 || percentage === 0) return "bg-zinc-100 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800";
+    if (percentage < 25) return "bg-blue-100 dark:bg-blue-950/40 border-blue-200 dark:border-blue-900/50";
+    if (percentage < 50) return "bg-blue-200 dark:bg-blue-900/60 border-blue-300 dark:border-blue-800";
+    if (percentage < 100) return "bg-blue-400 dark:bg-blue-800 border-blue-400 dark:border-blue-700";
     return "bg-blue-600 border-blue-500";
   };
 
@@ -95,23 +95,23 @@ export default function Calendar() {
   };
 
   return (
-    <View className="flex-1 bg-zinc-950" style={{ paddingTop: insets.top }}>
+    <View className="flex-1 bg-zinc-50 dark:bg-zinc-950" style={{ paddingTop: insets.top }}>
       <ScrollView className="flex-1 px-5" contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}>
         
         {/* Search Bar */}
         <View className="mt-4 mb-4">
-          <View className="flex-row items-center bg-zinc-900 border border-zinc-800 rounded-2xl px-4 py-2.5">
+          <View className="flex-row items-center bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl px-4 py-2.5 shadow-sm">
             <Search size={18} color="#71717a" style={{ marginRight: 8 }} />
             <TextInput
               value={searchQuery}
               onChangeText={setSearchQuery}
               placeholder="Search habits..."
-              placeholderTextColor="#71717a"
-              className="flex-1 text-white text-sm py-1 outline-none"
+              placeholderTextColor="#a1a1aa"
+              className="flex-1 text-zinc-900 dark:text-white text-sm py-1 outline-none"
             />
             {searchQuery ? (
               <TouchableOpacity onPress={() => setSearchQuery("")}>
-                <X size={16} color="#a1a1aa" />
+                <X size={16} color="#71717a" />
               </TouchableOpacity>
             ) : null}
           </View>
@@ -119,38 +119,38 @@ export default function Calendar() {
 
         {/* Page Title */}
         <View className="mb-6">
-          <Text className="text-white text-3xl font-extrabold tracking-tight">Calendar</Text>
-          <Text className="text-zinc-400 mt-1 text-sm">Track your habit consistency over time 🗓️</Text>
+          <Text className="text-zinc-900 dark:text-white text-3xl font-extrabold tracking-tight">Calendar</Text>
+          <Text className="text-zinc-500 dark:text-zinc-400 mt-1 text-sm">Track your habit consistency over time 🗓️</Text>
         </View>
 
         {isLoading ? (
           <View className="flex-1 items-center justify-center py-20">
-            <ActivityIndicator size="large" color="#60a5fa" />
+            <ActivityIndicator size="large" color="#3b82f6" />
           </View>
         ) : (
           <View>
             {/* Calendar Main Card */}
-            <View className="bg-zinc-900 border border-zinc-800 rounded-3xl p-4 mb-6 shadow-sm">
+            <View className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-4 mb-6 shadow-sm">
               
               {/* Navigation Header */}
               <View className="flex-row justify-between items-center mb-4">
                 <View className="flex-row items-center">
-                  <TouchableOpacity onPress={goToPreviousMonth} className="p-2 bg-zinc-800 rounded-full mr-2">
-                    <ChevronLeft size={18} color="#e4e4e7" />
+                  <TouchableOpacity onPress={goToPreviousMonth} className="p-2 bg-zinc-100 dark:bg-zinc-800 rounded-full mr-2">
+                    <ChevronLeft size={18} color="#71717a" />
                   </TouchableOpacity>
-                  <Text className="text-white font-bold text-lg">{format(currentDate, "MMMM yyyy")}</Text>
-                  <TouchableOpacity onPress={goToNextMonth} className="p-2 bg-zinc-800 rounded-full ml-2">
-                    <ChevronRight size={18} color="#e4e4e7" />
+                  <Text className="text-zinc-900 dark:text-white font-bold text-lg">{format(currentDate, "MMMM yyyy")}</Text>
+                  <TouchableOpacity onPress={goToNextMonth} className="p-2 bg-zinc-100 dark:bg-zinc-800 rounded-full ml-2">
+                    <ChevronRight size={18} color="#71717a" />
                   </TouchableOpacity>
                 </View>
 
-                <TouchableOpacity onPress={goToToday} className="bg-blue-500/20 px-3 py-1.5 rounded-xl border border-blue-500/30">
-                  <Text className="text-blue-400 text-xs font-semibold">Today</Text>
+                <TouchableOpacity onPress={goToToday} className="bg-blue-50 dark:bg-blue-500/20 px-3 py-1.5 rounded-xl border border-blue-200 dark:border-blue-500/30">
+                  <Text className="text-blue-600 dark:text-blue-400 text-xs font-semibold">Today</Text>
                 </TouchableOpacity>
               </View>
 
               {/* Weekday Header Row */}
-              <View className="flex-row mb-2 border-b border-zinc-800/80 pb-2">
+              <View className="flex-row mb-2 border-b border-zinc-200 dark:border-zinc-800/80 pb-2">
                 {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map((day) => (
                   <View key={day} className="flex-1 items-center">
                     <Text className="text-zinc-500 font-mono text-[10px] font-semibold">{day}</Text>
@@ -160,7 +160,7 @@ export default function Calendar() {
 
               {/* Days Grid */}
               <View className="flex-row flex-wrap">
-                {/* Empty Spacers for start of month alignment */}
+                {/* Empty Spacers */}
                 {Array.from({ length: monthStart.getDay() }).map((_, i) => (
                   <View key={`empty-${i}`} className="w-[14.28%] aspect-square p-1" />
                 ))}
@@ -173,13 +173,13 @@ export default function Calendar() {
 
                   return (
                     <View key={day.toISOString()} className="w-[14.28%] aspect-square p-1">
-                      <View className={`w-full h-full rounded-xl border p-1 justify-between items-center ${heatBg} ${isToday ? "border-blue-400 border-2" : ""}`}>
-                        <Text className={`text-[10px] font-mono font-bold ${percentage === 100 ? "text-white" : "text-zinc-300"}`}>
+                      <View className={`w-full h-full rounded-xl border p-1 justify-between items-center ${heatBg} ${isToday ? "border-blue-500 border-2" : ""}`}>
+                        <Text className={`text-[10px] font-mono font-bold ${percentage === 100 ? "text-white" : "text-zinc-700 dark:text-zinc-300"}`}>
                           {format(day, "d")}
                         </Text>
 
                         {total > 0 ? (
-                          <Text className={`text-[9px] font-semibold ${percentage === 100 ? "text-white" : "text-zinc-400"}`}>
+                          <Text className={`text-[9px] font-semibold ${percentage === 100 ? "text-white" : "text-zinc-500 dark:text-zinc-400"}`}>
                             {completed}/{total}
                           </Text>
                         ) : null}
@@ -190,19 +190,19 @@ export default function Calendar() {
               </View>
 
               {/* Consistency Legend */}
-              <View className="mt-4 pt-3 border-t border-zinc-800/80 flex-row flex-wrap items-center justify-between">
-                <Text className="text-zinc-400 text-[10px] font-semibold mr-2">Consistency:</Text>
+              <View className="mt-4 pt-3 border-t border-zinc-200 dark:border-zinc-800/80 flex-row flex-wrap items-center justify-between">
+                <Text className="text-zinc-500 dark:text-zinc-400 text-[10px] font-semibold mr-2">Consistency:</Text>
                 <View className="flex-row items-center gap-2">
                   <View className="flex-row items-center">
-                    <View className="w-2.5 h-2.5 rounded bg-zinc-900 border border-zinc-700 mr-1" />
+                    <View className="w-2.5 h-2.5 rounded bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 mr-1" />
                     <Text className="text-zinc-500 text-[9px]">0%</Text>
                   </View>
                   <View className="flex-row items-center">
-                    <View className="w-2.5 h-2.5 rounded bg-blue-900/60 mr-1" />
+                    <View className="w-2.5 h-2.5 rounded bg-blue-200 dark:bg-blue-900/60 mr-1" />
                     <Text className="text-zinc-500 text-[9px]">25%</Text>
                   </View>
                   <View className="flex-row items-center">
-                    <View className="w-2.5 h-2.5 rounded bg-blue-800 mr-1" />
+                    <View className="w-2.5 h-2.5 rounded bg-blue-400 dark:bg-blue-800 mr-1" />
                     <Text className="text-zinc-500 text-[9px]">50%</Text>
                   </View>
                   <View className="flex-row items-center">
@@ -214,45 +214,45 @@ export default function Calendar() {
             </View>
 
             {/* Monthly Mastery Card */}
-            <View className="bg-zinc-900 border border-zinc-800 rounded-3xl p-5 mb-6 shadow-sm">
-              <Text className="text-white text-lg font-bold mb-4">Monthly Mastery</Text>
+            <View className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 mb-6 shadow-sm">
+              <Text className="text-zinc-900 dark:text-white text-lg font-bold mb-4">Monthly Mastery</Text>
               
               <View className="mb-4">
                 <View className="flex-row justify-between items-center mb-1.5">
-                  <Text className="text-zinc-400 text-xs">Completion Rate</Text>
-                  <Text className="text-blue-400 font-bold text-base">{monthCompletionRate}%</Text>
+                  <Text className="text-zinc-500 dark:text-zinc-400 text-xs">Completion Rate</Text>
+                  <Text className="text-blue-600 dark:text-blue-400 font-bold text-base">{monthCompletionRate}%</Text>
                 </View>
-                <View className="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
-                  <View className="bg-blue-500 h-full rounded-full" style={{ width: `${monthCompletionRate}%` }} />
+                <View className="w-full bg-zinc-200 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
+                  <View className="bg-blue-600 h-full rounded-full" style={{ width: `${monthCompletionRate}%` }} />
                 </View>
               </View>
 
               <View className="flex-row justify-between gap-3">
-                <View className="flex-1 bg-zinc-800/60 p-3 rounded-2xl flex-row items-center">
+                <View className="flex-1 bg-zinc-100 dark:bg-zinc-800/60 p-3 rounded-2xl flex-row items-center">
                   <View className="bg-orange-500/20 p-2 rounded-xl mr-3">
                     <Flame size={16} color="#f97316" />
                   </View>
                   <View>
-                    <Text className="text-zinc-400 text-[9px] uppercase font-mono">Max Streak</Text>
-                    <Text className="text-white font-bold text-base">{maxStreak} Days</Text>
+                    <Text className="text-zinc-500 dark:text-zinc-400 text-[9px] uppercase font-mono">Max Streak</Text>
+                    <Text className="text-zinc-900 dark:text-white font-bold text-base">{maxStreak} Days</Text>
                   </View>
                 </View>
 
-                <View className="flex-1 bg-zinc-800/60 p-3 rounded-2xl flex-row items-center">
+                <View className="flex-1 bg-zinc-100 dark:bg-zinc-800/60 p-3 rounded-2xl flex-row items-center">
                   <View className="bg-blue-500/20 p-2 rounded-xl mr-3">
                     <CheckCircle2 size={16} color="#3b82f6" />
                   </View>
                   <View>
-                    <Text className="text-zinc-400 text-[9px] uppercase font-mono">Total Done</Text>
-                    <Text className="text-white font-bold text-base">{completedMonthLogsCount}</Text>
+                    <Text className="text-zinc-500 dark:text-zinc-400 text-[9px] uppercase font-mono">Total Done</Text>
+                    <Text className="text-zinc-900 dark:text-white font-bold text-base">{completedMonthLogsCount}</Text>
                   </View>
                 </View>
               </View>
             </View>
 
             {/* Focus Habits Progress List */}
-            <View className="bg-zinc-900 border border-zinc-800 rounded-3xl p-5 mb-6 shadow-sm">
-              <Text className="text-white text-lg font-bold mb-4">Focus Habits (Recent 5-Day)</Text>
+            <View className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 mb-6 shadow-sm">
+              <Text className="text-zinc-900 dark:text-white text-lg font-bold mb-4">Focus Habits (Recent 5-Day)</Text>
               
               {filteredFocusHabits.length === 0 ? (
                 <Text className="text-zinc-500 text-xs">No active habits found.</Text>
@@ -260,12 +260,12 @@ export default function Calendar() {
                 filteredFocusHabits.slice(0, 5).map((habit) => {
                   const indicators = getRecentCompletionIndicators(habit.id);
                   return (
-                    <View key={habit.id} className="flex-row items-center justify-between p-3 bg-zinc-800/50 rounded-2xl mb-3 border border-zinc-800">
+                    <View key={habit.id} className="flex-row items-center justify-between p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl mb-3 border border-zinc-200 dark:border-zinc-800">
                       <View className="flex-row items-center flex-1 mr-3">
-                        <View className="w-8 h-8 rounded-lg bg-zinc-800 items-center justify-center mr-3">
-                          <Text className="text-white font-bold text-xs">{habit.title.slice(0, 2).toUpperCase()}</Text>
+                        <View className="w-8 h-8 rounded-lg bg-zinc-200 dark:bg-zinc-800 items-center justify-center mr-3">
+                          <Text className="text-zinc-900 dark:text-white font-bold text-xs">{habit.title.slice(0, 2).toUpperCase()}</Text>
                         </View>
-                        <Text className="text-white font-semibold text-sm truncate flex-1" numberOfLines={1}>{habit.title}</Text>
+                        <Text className="text-zinc-900 dark:text-white font-semibold text-sm truncate flex-1" numberOfLines={1}>{habit.title}</Text>
                       </View>
 
                       {/* 5-Day Sparkline Dots */}
@@ -273,7 +273,7 @@ export default function Calendar() {
                         {indicators.map((isDone, i) => (
                           <View
                             key={i}
-                            className={`w-3.5 h-3.5 rounded-full ${isDone ? "bg-blue-500" : "bg-zinc-800"}`}
+                            className={`w-3.5 h-3.5 rounded-full ${isDone ? "bg-blue-600" : "bg-zinc-200 dark:bg-zinc-800"}`}
                           />
                         ))}
                       </View>
