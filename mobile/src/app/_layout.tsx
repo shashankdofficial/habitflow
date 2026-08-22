@@ -41,14 +41,18 @@ function InitialLayout() {
   return <Slot />;
 }
 
+import { SearchProvider } from "../context/SearchContext";
+
 export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <SafeAreaProvider>
-          <StatusBar style="light" />
-          <InitialLayout />
-        </SafeAreaProvider>
+        <SearchProvider>
+          <SafeAreaProvider>
+            <StatusBar style="light" />
+            <InitialLayout />
+          </SafeAreaProvider>
+        </SearchProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

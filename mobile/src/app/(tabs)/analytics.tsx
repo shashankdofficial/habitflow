@@ -1,15 +1,17 @@
-import { View, Text, ScrollView, ActivityIndicator } from "react-native";
+import { View, Text, ScrollView, ActivityIndicator, TextInput, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "../../context/AuthContext";
 import { useHabits } from "../../hooks/useHabits";
 import { getHabitLogs, calculateStreak } from "../../lib/habits";
 import { useQuery } from "@tanstack/react-query";
-import { Target, TrendingUp, Flame, Calendar as CalendarIcon, CheckCircle2 } from "lucide-react-native";
+import { Target, TrendingUp, Flame, CheckCircle2, Search, X } from "lucide-react-native";
 import { subDays, isSameDay, format } from "date-fns";
+import { useSearch } from "../../context/SearchContext";
 
 export default function Analytics() {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
+  const { searchQuery, setSearchQuery } = useSearch();
   
   const { habits, isLoading: habitsLoading } = useHabits(user?.uid);
 
@@ -62,8 +64,17 @@ export default function Analytics() {
 
   const weeklyData = getWeeklyCompletionData();
 
-  // Habit Performance Data
-  const habitPerformance = habits.map((habit) => {
+  // Habit Performance Data filtered by Search
+  const filteredHabits = habits.filter((habit) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      habit.title.toLowerCase().includes(query) ||
+      !!(habit.description && habit.description.toLowerCase().includes(query))
+    );
+  });
+
+  const habitPerformance = filteredHabits.map((habit) => {
     const habitLogs = allLogs.filter((l) => l.habit_id === habit.id);
     const completedCount = habitLogs.filter((l) => l.status === "completed").length;
     const totalDays = habitLogs.length || 1;
@@ -79,11 +90,30 @@ export default function Analytics() {
 
   return (
     <View className="flex-1 bg-zinc-950" style={{ paddingTop: insets.top }}>
-      <ScrollView className="flex-1 px-6" contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}>
+      <ScrollView className="flex-1 px-5" contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}>
         
-        <View className="mt-4 mb-8">
+        {/* Global Search Bar */}
+        <View className="mt-4 mb-4">
+          <View className="flex-row items-center bg-zinc-900 border border-zinc-800 rounded-2xl px-4 py-2.5">
+            <Search size={18} color="#71717a" style={{ marginRight: 8 }} />
+            <TextInput
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholder="Search analytics..."
+              placeholderTextColor="#71717a"
+              className="flex-1 text-white text-sm py-1 outline-none"
+            />
+            {searchQuery ? (
+              <TouchableOpacity onPress={() => setSearchQuery("")}>
+                <X size={16} color="#a1a1aa" />
+              </TouchableOpacity>
+            ) : null}
+          </View>
+        </View>
+
+        <View className="mb-6">
           <Text className="text-white text-3xl font-extrabold tracking-tight">Analytics</Text>
-          <Text className="text-zinc-400 mt-1 text-base">Track your progress and mastery</Text>
+          <Text className="text-zinc-400 mt-1 text-sm">Track your progress and mastery 📊</Text>
         </View>
 
         {isLoading ? (
@@ -99,8 +129,8 @@ export default function Analytics() {
         ) : (
           <View>
             {/* Bento Grid High Level Metrics */}
-            <View className="flex-row flex-wrap justify-between gap-3 mb-8">
-              <View className="w-[48%] bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-sm mb-3">
+            <View className="flex-row flex-wrap justify-between gap-2.5 mb-6">
+              <View className="w-[48%] bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-sm mb-1">
                 <Text className="text-zinc-400 text-[10px] uppercase font-mono tracking-wider mb-2">Total Habits</Text>
                 <View className="flex-row items-center justify-between">
                   <Text className="text-white text-3xl font-bold">{habits.length}</Text>
@@ -108,7 +138,7 @@ export default function Analytics() {
                 </View>
               </View>
 
-              <View className="w-[48%] bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-sm mb-3">
+              <View className="w-[48%] bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-sm mb-1">
                 <Text className="text-zinc-400 text-[10px] uppercase font-mono tracking-wider mb-2">Total Check-ins</Text>
                 <View className="flex-row items-center justify-between">
                   <Text className="text-white text-3xl font-bold">{totalCheckInsCount}</Text>
@@ -124,7 +154,7 @@ export default function Analytics() {
                 </View>
               </View>
 
-              <View className="w-[48%] bg-blue-900/30 border border-blue-900 rounded-2xl p-4 shadow-sm">
+              <View className="w-[48%] bg-blue-950/40 border border-blue-900/60 rounded-2xl p-4 shadow-sm">
                 <Text className="text-blue-300 text-[10px] uppercase font-mono tracking-wider mb-2">Longest Streak</Text>
                 <View className="flex-row items-center justify-between">
                   <Text className="text-white text-3xl font-bold">{maxStreak}</Text>
@@ -134,7 +164,7 @@ export default function Analytics() {
             </View>
 
             {/* Weekly Completion Bar Chart */}
-            <View className="bg-zinc-900 border border-zinc-800 rounded-3xl p-5 mb-8 shadow-sm">
+            <View className="bg-zinc-900 border border-zinc-800 rounded-3xl p-5 mb-6 shadow-sm">
               <Text className="text-white text-lg font-bold mb-1">Weekly Completion</Text>
               <Text className="text-zinc-400 text-xs mb-6">Last 7 days consistency rate</Text>
               
@@ -144,7 +174,7 @@ export default function Analytics() {
                     <View className="w-full h-24 justify-end">
                       <View 
                         className="w-full bg-blue-500 rounded-t-md" 
-                        style={{ height: `${Math.max(day.completion, 5)}%` }} // Give at least 5% so it's visible
+                        style={{ height: `${Math.max(day.completion, 5)}%` }}
                       />
                     </View>
                     <Text className="text-zinc-400 text-xs mt-2">{day.dayName}</Text>
@@ -154,34 +184,38 @@ export default function Analytics() {
             </View>
 
             {/* Habit Performance List */}
-            <View className="bg-zinc-900 border border-zinc-800 rounded-3xl p-5 mb-8 shadow-sm">
-              <Text className="text-white text-lg font-bold mb-6">Habit Performance</Text>
+            <View className="bg-zinc-900 border border-zinc-800 rounded-3xl p-5 mb-6 shadow-sm">
+              <Text className="text-white text-lg font-bold mb-5">Habit Performance</Text>
               
-              {habitPerformance.map((habit) => (
-                <View key={habit.id} className="mb-5">
-                  <View className="flex-row justify-between items-center mb-2">
-                    <View className="flex-row items-center">
-                      <View className="bg-zinc-800 w-8 h-8 rounded-lg items-center justify-center mr-3">
-                        <Text className="text-white font-bold text-xs">{habit.title.slice(0, 2).toUpperCase()}</Text>
+              {habitPerformance.length === 0 ? (
+                <Text className="text-zinc-500 text-xs">No habits match search query.</Text>
+              ) : (
+                habitPerformance.map((habit) => (
+                  <View key={habit.id} className="mb-4">
+                    <View className="flex-row justify-between items-center mb-1.5">
+                      <View className="flex-row items-center flex-1 mr-2">
+                        <View className="bg-zinc-800 w-8 h-8 rounded-lg items-center justify-center mr-3">
+                          <Text className="text-white font-bold text-xs">{habit.title.slice(0, 2).toUpperCase()}</Text>
+                        </View>
+                        <Text className="text-white font-semibold text-sm truncate flex-1" numberOfLines={1}>{habit.title}</Text>
                       </View>
-                      <Text className="text-white font-semibold">{habit.title}</Text>
+                      <Text className="text-blue-400 font-bold text-xs">{habit.completionRate}% Rate</Text>
                     </View>
-                    <Text className="text-blue-400 font-bold text-xs">{habit.completionRate}% Rate</Text>
+                    
+                    <View className="w-full h-2 bg-zinc-800 rounded-full mb-1 overflow-hidden">
+                      <View 
+                        className="h-full bg-blue-500 rounded-full" 
+                        style={{ width: `${habit.completionRate}%` }}
+                      />
+                    </View>
+                    
+                    <View className="flex-row items-center mt-0.5">
+                      <Flame size={10} color="#f97316" />
+                      <Text className="text-zinc-500 text-[10px] ml-1">{habit.currentStreak} day streak</Text>
+                    </View>
                   </View>
-                  
-                  <View className="w-full h-2 bg-zinc-800 rounded-full mb-1 overflow-hidden">
-                    <View 
-                      className="h-full bg-blue-500 rounded-full" 
-                      style={{ width: `${habit.completionRate}%` }}
-                    />
-                  </View>
-                  
-                  <View className="flex-row items-center mt-1">
-                    <Flame size={10} color="#f97316" />
-                    <Text className="text-zinc-500 text-[10px] ml-1">{habit.currentStreak} day streak</Text>
-                  </View>
-                </View>
-              ))}
+                ))
+              )}
             </View>
 
           </View>

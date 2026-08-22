@@ -1,16 +1,18 @@
-import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, TextInput } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "../../context/AuthContext";
 import { useHabits, useHabitLogs } from "../../hooks/useHabits";
 import { Habit } from "../../types";
-import { Flame, Target, Check, CalendarDays, Plus } from "lucide-react-native";
+import { Flame, Target, Check, CalendarDays, Plus, Search, X } from "lucide-react-native";
 import { getHabitStatusForDay, calculateStreak } from "../../lib/habits";
 import { useQuery } from "@tanstack/react-query";
 import { getHabitLogs } from "../../lib/habits";
+import { useSearch } from "../../context/SearchContext";
 
 export default function AllHabits() {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
+  const { searchQuery, setSearchQuery } = useSearch();
   
   const { habits, isLoading } = useHabits(user?.uid);
 
@@ -24,6 +26,17 @@ export default function AllHabits() {
       return logsArrays.flat();
     },
     enabled: !!user?.uid && habits.length > 0,
+  });
+
+  const filteredHabits = habits.filter((habit) => {
+    if (!searchQuery || !searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    return (
+      habit.title.toLowerCase().includes(q) ||
+      (!!habit.description && habit.description.toLowerCase().includes(q)) ||
+      habit.frequency.toLowerCase().includes(q) ||
+      (!!habit.time_of_day && habit.time_of_day.toLowerCase().includes(q))
+    );
   });
 
   const HabitCard = ({ habit }: { habit: Habit }) => {
@@ -58,7 +71,11 @@ export default function AllHabits() {
             </View>
           </View>
           
-          <View className="flex-row items-center mt-2">
+          {habit.description ? (
+            <Text className="text-zinc-400 text-xs mb-2" numberOfLines={1}>{habit.description}</Text>
+          ) : null}
+
+          <View className="flex-row items-center mt-1">
             <View className="flex-row items-center mr-4">
               <Flame size={14} color="#f97316" />
               <Text className="text-orange-500 text-xs ml-1 font-medium">
@@ -97,26 +114,43 @@ export default function AllHabits() {
 
   return (
     <View className="flex-1 bg-zinc-950" style={{ paddingTop: insets.top }}>
-      <ScrollView className="flex-1 px-6" contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}>
-        <View className="flex-row items-center justify-between mb-8 mt-4">
+      <ScrollView className="flex-1 px-5" contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}>
+        
+        {/* Global Search Bar */}
+        <View className="mt-4 mb-4">
+          <View className="flex-row items-center bg-zinc-900 border border-zinc-800 rounded-2xl px-4 py-2.5">
+            <Search size={18} color="#71717a" style={{ marginRight: 8 }} />
+            <TextInput
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholder="Search habits..."
+              placeholderTextColor="#71717a"
+              className="flex-1 text-white text-sm py-1 outline-none"
+            />
+            {searchQuery ? (
+              <TouchableOpacity onPress={() => setSearchQuery("")}>
+                <X size={16} color="#a1a1aa" />
+              </TouchableOpacity>
+            ) : null}
+          </View>
+        </View>
+
+        <View className="flex-row items-center justify-between mb-6">
           <View>
             <Text className="text-white text-3xl font-extrabold tracking-tight">All Habits</Text>
-            <Text className="text-zinc-400 mt-1 text-base">
-              You are tracking {habits.length} habits
+            <Text className="text-zinc-400 mt-1 text-sm">
+              Tracking {filteredHabits.length} of {habits.length} habits
             </Text>
           </View>
-          <TouchableOpacity className="bg-blue-500 w-10 h-10 rounded-full items-center justify-center shadow-md">
-            <Plus size={24} color="#fff" />
-          </TouchableOpacity>
         </View>
 
         {isLoading ? (
           <View className="flex-1 items-center justify-center py-20">
             <ActivityIndicator size="large" color="#60a5fa" />
           </View>
-        ) : habits.length > 0 ? (
+        ) : filteredHabits.length > 0 ? (
           <View>
-            {habits.map((habit) => (
+            {filteredHabits.map((habit) => (
               <HabitCard key={habit.id} habit={habit} />
             ))}
           </View>
@@ -126,11 +160,7 @@ export default function AllHabits() {
               <Check size={32} color="#71717a" />
             </View>
             <Text className="text-zinc-300 text-center text-lg font-semibold mb-2">No habits found.</Text>
-            <Text className="text-zinc-500 text-center text-sm mb-6">Create your first habit to start building your routine!</Text>
-            <TouchableOpacity className="bg-blue-500 px-6 py-3 rounded-xl flex-row items-center shadow-md">
-              <Plus size={20} color="#fff" style={{ marginRight: 8 }} />
-              <Text className="text-white font-semibold">Create Habit</Text>
-            </TouchableOpacity>
+            <Text className="text-zinc-500 text-center text-sm mb-2">Try clearing your search query or add your first habit.</Text>
           </View>
         )}
       </ScrollView>
