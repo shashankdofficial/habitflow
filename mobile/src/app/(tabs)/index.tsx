@@ -7,6 +7,7 @@ import { calculateUserGamification } from "../../lib/habits";
 import { Check, Flame, Target, Trophy, Target as TargetIcon, TrendingUp, Search, Sparkles, X, Sun, Sunset, Moon } from "lucide-react-native";
 import { Habit } from "../../types";
 import { useSearch } from "../../context/SearchContext";
+import { AICoachWidget } from "../../components/AICoachWidget";
 
 export default function Dashboard() {
   const insets = useSafeAreaInsets();
@@ -206,19 +207,8 @@ export default function Dashboard() {
           </View>
         </View>
 
-        {/* AI Habit Coach / Quick Tip Card */}
-        <View className="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/60 p-4 rounded-2xl mb-6 flex-row items-start">
-          <View className="bg-blue-500/20 p-2 rounded-xl mr-3 mt-0.5">
-            <Sparkles size={18} color="#3b82f6" />
-          </View>
-          <View className="flex-1">
-            <Text className="text-blue-600 dark:text-blue-400 font-mono text-[10px] uppercase tracking-wider mb-0.5">Atomic Habits Rule</Text>
-            <Text className="text-zinc-900 dark:text-white font-semibold text-sm mb-1">Focus 1% Better Every Day</Text>
-            <Text className="text-zinc-600 dark:text-zinc-400 text-xs leading-relaxed">
-              Small consistent daily actions compound into massive long-term identity changes.
-            </Text>
-          </View>
-        </View>
+        {/* AI Habit Coach Widget */}
+        <AICoachWidget habits={todayHabits} logs={allLogs} />
 
         {/* Stats Grid */}
         <View className="flex-row justify-between mb-6 gap-2">

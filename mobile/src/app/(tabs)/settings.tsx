@@ -9,6 +9,7 @@ import { getHabitLogs, calculateStreak } from "../../lib/habits";
 import { useQuery } from "@tanstack/react-query";
 import { User, LogOut, Bell, Shield, Moon, Save, KeyRound, Flame, CheckCircle2, Award } from "lucide-react-native";
 import { useColorScheme } from "nativewind";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Settings() {
   const insets = useSafeAreaInsets();
@@ -38,8 +39,14 @@ export default function Settings() {
 
   const isDarkMode = colorScheme === "dark";
 
-  const handleToggleDarkMode = (val: boolean) => {
-    setColorScheme(val ? "dark" : "light");
+  const handleToggleDarkMode = async (val: boolean) => {
+    const newTheme = val ? "dark" : "light";
+    setColorScheme(newTheme);
+    try {
+      await AsyncStorage.setItem("habitflow_theme", newTheme);
+    } catch (err) {
+      console.warn("Failed to save theme", err);
+    }
   };
 
   useEffect(() => {
