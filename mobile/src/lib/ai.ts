@@ -18,44 +18,58 @@ export interface AIRecommendedHabit {
   icon: string;
 }
 
-const OPENROUTER_API_KEY = process.env.EXPO_PUBLIC_OPENROUTER_API_KEY;
-const MODEL = "google/gemma-2-9b-it:free"; 
+const FREE_MODELS = [
+  "google/gemini-2.0-flash-lite-preview-02-05:free",
+  "meta-llama/llama-3.3-70b-instruct:free",
+  "mistralai/mistral-7b-instruct:free",
+  "google/gemma-2-9b-it:free"
+];
 
 async function callOpenRouter(prompt: string): Promise<string | null> {
-  if (!OPENROUTER_API_KEY || OPENROUTER_API_KEY === "your_openrouter_api_key_here") {
+  const apiKey = process.env.EXPO_PUBLIC_OPENROUTER_API_KEY;
+  if (!apiKey || apiKey === "your_openrouter_api_key_here") {
     return null;
   }
 
-  try {
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "http://localhost:8081",
-        "X-Title": "HabitFlow Mobile",
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [
-          { role: "user", content: prompt }
-        ],
-        response_format: { type: "json_object" }
-      })
-    });
+  for (const model of FREE_MODELS) {
+    try {
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "http://localhost:8081",
+          "X-Title": "HabitFlow Mobile",
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: [
+            { role: "user", content: prompt }
+          ],
+          response_format: { type: "json_object" }
+        })
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("OpenRouter Error Payload:", errorText);
-      throw new Error(`OpenRouter API error: ${response.status} ${response.statusText}`);
+      if (response.status === 404) {
+        console.warn(`OpenRouter model ${model} returned 404, trying fallback model...`);
+        continue;
+      }
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("OpenRouter Error Payload:", errorText);
+        throw new Error(`OpenRouter API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (data?.choices?.[0]?.message?.content) {
+        return data.choices[0].message.content;
+      }
+    } catch (err) {
+      console.error(`OpenRouter fetch error with model ${model}:`, err);
     }
-
-    const data = await response.json();
-    return data.choices[0].message.content;
-  } catch (err) {
-    console.error("OpenRouter fetch error:", err);
-    return null;
   }
+  return null;
 }
 
 export async function getAICoachInsights(habits: Habit[], logs: HabitLog[]): Promise<AICoachInsight> {
