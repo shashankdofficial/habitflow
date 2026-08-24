@@ -18,11 +18,15 @@ export interface AIRecommendedHabit {
   icon: string;
 }
 
+// Active free models on OpenRouter (excluding models marked as "Going away")
 const FREE_MODELS = [
-  "google/gemini-2.0-flash-lite-preview-02-05:free",
-  "meta-llama/llama-3.3-70b-instruct:free",
-  "mistralai/mistral-7b-instruct:free",
-  "google/gemma-2-9b-it:free"
+  "google/gemma-4-31b:free",
+  "google/gemma-4-26b-a4b:free",
+  "nvidia/nemotron-3-ultra:free",
+  "nvidia/nemotron-3-super:free",
+  "nvidia/nemotron-3.5-lightning:free",
+  "zai/glm-5.2:free",
+  "liquid/lfm2.5-1.2b:free"
 ];
 
 async function callOpenRouter(prompt: string): Promise<string | null> {
@@ -45,18 +49,14 @@ async function callOpenRouter(prompt: string): Promise<string | null> {
           model: model,
           messages: [
             { role: "user", content: prompt }
-          ],
-          response_format: { type: "json_object" }
+          ]
         })
       });
 
-      if (response.status === 404) {
-        console.warn(`OpenRouter model ${model} returned 404, trying fallback model...`);
-        continue;
-      }
-
       if (!response.ok) {
-        throw new Error(`OpenRouter API error: ${response.statusText}`);
+        const errorText = await response.text();
+        console.warn(`OpenRouter model ${model} failed (${response.status}):`, errorText);
+        continue;
       }
 
       const data = await response.json();
@@ -64,7 +64,7 @@ async function callOpenRouter(prompt: string): Promise<string | null> {
         return data.choices[0].message.content;
       }
     } catch (err) {
-      console.error(`OpenRouter fetch error with model ${model}:`, err);
+      console.warn(`OpenRouter fetch error with model ${model}:`, err);
     }
   }
   return null;
@@ -100,7 +100,7 @@ Return ONLY a JSON object with this exact structure:
   "tips": ["Tip 1", "Tip 2", "Tip 3"],
   "suggestedAction": "Actionable focus for today"
 }
-Do not include markdown codeblocks (\`\`\`json). Just return the raw JSON object.`;
+Do not include markdown codeblocks (\`\`\`json). Just return raw JSON text.`;
 
   const aiResponseText = await callOpenRouter(prompt);
 
@@ -147,7 +147,7 @@ export async function generateAIHabitSuggestions(userGoal: string): Promise<AIRe
 Generate 3 distinct, high-impact habit templates.
 Return ONLY a JSON array of objects with these exact keys:
 "title", "description", "frequency" ("daily" | "weekly"), "time_of_day" ("morning" | "afternoon" | "evening" | "anytime"), "target_value" (number or null), "target_unit" (string or null), "color" ("blue"|"green"|"purple"|"orange"|"pink"|"red"), "icon" ("water"|"fitness"|"self_improvement"|"book"|"sleep"|"work"|"food").
-Do not include markdown codeblocks (\`\`\`json). Just return the raw JSON array.`;
+Do not include markdown codeblocks (\`\`\`json). Just return raw JSON text.`;
 
   const aiResponseText = await callOpenRouter(prompt);
 
