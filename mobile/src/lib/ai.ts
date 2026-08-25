@@ -18,15 +18,18 @@ export interface AIRecommendedHabit {
   icon: string;
 }
 
-// Active free models on OpenRouter (excluding models marked as "Going away")
+// Active free models on OpenRouter with correct API slugs
 const FREE_MODELS = [
-  "google/gemma-4-31b:free",
-  "google/gemma-4-26b-a4b:free",
+  "google/gemma-4-31b-it:free",
+  "google/gemma-4-26b-a4b-it:free",
   "nvidia/nemotron-3-ultra:free",
   "nvidia/nemotron-3-super:free",
   "nvidia/nemotron-3.5-lightning:free",
-  "zai/glm-5.2:free",
-  "liquid/lfm2.5-1.2b:free"
+  "z-ai/glm-5.2:free",
+  "thinkingmachines/inkling-small:free",
+  "liquid/lfm-2.5-2.6b:free",
+  "meta-llama/llama-3.3-70b-instruct:free",
+  "deepseek/deepseek-r1:free"
 ];
 
 async function callOpenRouter(prompt: string): Promise<string | null> {
@@ -140,4 +143,127 @@ Do not include markdown codeblocks (\`\`\`json). Just return raw JSON text.`;
     ],
     suggestedAction: "Check off your highest priority habit"
   };
+}
+
+export async function generateAIHabitSuggestions(userGoal: string): Promise<AIRecommendedHabit[]> {
+  const prompt = `A user wants habits for the goal: "${userGoal}".
+Generate 3 distinct, high-impact habit templates.
+Return ONLY a JSON array of objects with these exact keys:
+"title", "description", "frequency" ("daily" | "weekly"), "time_of_day" ("morning" | "afternoon" | "evening" | "anytime"), "target_value" (number or null), "target_unit" (string or null), "color" ("#3b82f6"|"#22c55e"|"#a855f7"|"#f97316"|"#eab308"|"#f43f5e"), "icon" ("Dumbbell"|"Droplets"|"Smile"|"BookOpen"|"Bed"|"Briefcase"|"Utensils").
+Do not include markdown codeblocks (\`\`\`json). Just return raw JSON text.`;
+
+  const aiResponseText = await callOpenRouter(prompt);
+
+  if (aiResponseText) {
+    try {
+      const cleaned = aiResponseText.replace(/```json/gi, "").replace(/```/g, "").trim();
+      const parsed = JSON.parse(cleaned);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    } catch (err) {
+      console.warn("OpenRouter habit generation error, using fallback templates:", err);
+    }
+  }
+
+  // Fallback rules
+  const goalLower = userGoal.toLowerCase();
+  if (goalLower.includes("fit") || goalLower.includes("health") || goalLower.includes("weight") || goalLower.includes("gym") || goalLower.includes("marathon")) {
+    return [
+      {
+        title: "Morning Hydration",
+        description: "Drink water right after waking up",
+        frequency: "daily",
+        time_of_day: "morning",
+        target_value: 2000,
+        target_unit: "ml",
+        color: "#3b82f6",
+        icon: "Droplets"
+      },
+      {
+        title: "Daily Workout Session",
+        description: "30 minutes of cardio or resistance exercise",
+        frequency: "daily",
+        time_of_day: "afternoon",
+        target_value: 30,
+        target_unit: "mins",
+        color: "#22c55e",
+        icon: "Dumbbell"
+      },
+      {
+        title: "8 Hours Restful Sleep",
+        description: "Sleep early and avoid screen time before bed",
+        frequency: "daily",
+        time_of_day: "evening",
+        color: "#a855f7",
+        icon: "Bed"
+      }
+    ];
+  }
+
+  if (goalLower.includes("read") || goalLower.includes("study") || goalLower.includes("focus") || goalLower.includes("learn")) {
+    return [
+      {
+        title: "Daily Reading",
+        description: "Read non-fiction or educational book",
+        frequency: "daily",
+        time_of_day: "evening",
+        target_value: 20,
+        target_unit: "pages",
+        color: "#a855f7",
+        icon: "BookOpen"
+      },
+      {
+        title: "Deep Work Sprint",
+        description: "Uninterrupted focused work block",
+        frequency: "daily",
+        time_of_day: "morning",
+        target_value: 45,
+        target_unit: "mins",
+        color: "#3b82f6",
+        icon: "Briefcase"
+      },
+      {
+        title: "Mindful Meditation",
+        description: "Calm breathing & reflection",
+        frequency: "daily",
+        time_of_day: "morning",
+        target_value: 10,
+        target_unit: "mins",
+        color: "#f97316",
+        icon: "Smile"
+      }
+    ];
+  }
+
+  return [
+    {
+      title: "Daily Hydration Goal",
+      description: "Keep body hydrated throughout the day",
+      frequency: "daily",
+      time_of_day: "morning",
+      target_value: 2500,
+      target_unit: "ml",
+      color: "#3b82f6",
+      icon: "Droplets"
+    },
+    {
+      title: "Morning Stretch & Walk",
+      description: "Light movement to activate energy",
+      frequency: "daily",
+      time_of_day: "morning",
+      target_value: 15,
+      target_unit: "mins",
+      color: "#22c55e",
+      icon: "Dumbbell"
+    },
+    {
+      title: "Evening Gratitude & Journal",
+      description: "Write down 3 wins of the day",
+      frequency: "daily",
+      time_of_day: "evening",
+      color: "#f43f5e",
+      icon: "BookOpen"
+    }
+  ];
 }

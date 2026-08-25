@@ -6,6 +6,7 @@ import { useHabitLogs, useHabits } from "@/hooks/useHabits";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import confetti from "canvas-confetti";
+import { HabitIcon } from "./HabitIcon";
 
 interface HabitCardProps {
   habit: {
@@ -176,7 +177,7 @@ export function HabitCard({ habit, status, streak, onToggle }: HabitCardProps) {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className={`p-4 rounded-2xl flex items-center justify-center shrink-0 ${colors.bg} ${colors.text}`}>
-              {getIconElement(habit.icon)}
+              <HabitIcon icon={habit.icon} title={habit.title} />
             </div>
 
             <div>

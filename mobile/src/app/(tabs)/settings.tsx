@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, ScrollView, TextInput, Switch, Alert, ActivityIndicator } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, TextInput, Switch, Alert, ActivityIndicator, Appearance } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { auth } from "../../lib/firebase";
 import { signOut, updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
@@ -37,11 +37,17 @@ export default function Settings() {
     ? auth.currentUser.providerData.some((prov) => prov.providerId === "password")
     : true;
 
-  const isDarkMode = colorScheme === "dark";
+  const [localIsDarkMode, setLocalIsDarkMode] = useState(colorScheme === "dark");
+
+  useEffect(() => {
+    setLocalIsDarkMode(colorScheme === "dark");
+  }, [colorScheme]);
 
   const handleToggleDarkMode = async (val: boolean) => {
+    setLocalIsDarkMode(val);
     const newTheme = val ? "dark" : "light";
     setColorScheme(newTheme);
+    Appearance.setColorScheme(newTheme);
     try {
       await AsyncStorage.setItem("habitflow_theme", newTheme);
     } catch (err) {
@@ -275,10 +281,10 @@ export default function Settings() {
           <View className="flex-row items-center justify-between">
             <View>
               <Text className="text-zinc-800 dark:text-zinc-200 font-medium text-sm">Dark Mode</Text>
-              <Text className="text-zinc-500 dark:text-zinc-400 text-xs mt-0.5">Toggle theme ({isDarkMode ? "Dark" : "Light"})</Text>
+              <Text className="text-zinc-500 dark:text-zinc-400 text-xs mt-0.5">Toggle theme ({localIsDarkMode ? "Dark" : "Light"})</Text>
             </View>
             <Switch
-              value={isDarkMode}
+              value={localIsDarkMode}
               onValueChange={handleToggleDarkMode}
               trackColor={{ false: "#d4d4d8", true: "#3b82f6" }}
               thumbColor="#fff"

@@ -1,14 +1,15 @@
-import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, TextInput } from "react-native";
+import { useCallback } from "react";
+import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, TextInput, Alert } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "../../context/AuthContext";
 import { useHabits, useHabitLogs } from "../../hooks/useHabits";
 import { Habit } from "../../types";
-import { Flame, Target, Check, CalendarDays, Plus, Search, X } from "lucide-react-native";
+import { Flame, Target, Check, CalendarDays, Plus, Search, X, Dumbbell, Droplets, Smile, BookOpen, Bed, Briefcase, Utensils, MoreHorizontal, Target as TargetIcon, Bell } from "lucide-react-native";
 import { getHabitStatusForDay, calculateStreak } from "../../lib/habits";
 import { useQuery } from "@tanstack/react-query";
 import { getHabitLogs } from "../../lib/habits";
 import { useSearch } from "../../context/SearchContext";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 
 export default function AllHabits() {
   const insets = useSafeAreaInsets();
@@ -16,10 +17,10 @@ export default function AllHabits() {
   const router = useRouter();
   const { searchQuery, setSearchQuery } = useSearch();
   
-  const { habits, isLoading } = useHabits(user?.uid);
+  const { habits, isLoading, deleteHabit, refetchHabits } = useHabits(user?.uid);
 
   // Fetch all logs to calculate streaks for all habits
-  const { data: allLogs = [] } = useQuery({
+  const { data: allLogs = [], refetch: refetchLogs } = useQuery({
     queryKey: ["allLogs", user?.uid],
     queryFn: async () => {
       if (!user?.uid || habits.length === 0) return [];
@@ -29,6 +30,13 @@ export default function AllHabits() {
     },
     enabled: !!user?.uid && habits.length > 0,
   });
+
+  useFocusEffect(
+    useCallback(() => {
+      refetchHabits();
+      refetchLogs();
+    }, [refetchHabits, refetchLogs])
+  );
 
   const filteredHabits = habits.filter((habit) => {
     if (!searchQuery || !searchQuery.trim()) return true;
@@ -61,10 +69,51 @@ export default function AllHabits() {
       }
     };
 
+    const getIcon = (iconName?: string) => {
+      switch (iconName) {
+        case "Dumbbell":
+        case "fitness_center": return <Dumbbell size={20} color={habit.color || "#3b82f6"} />;
+        case "Droplets":
+        case "water_drop": return <Droplets size={20} color={habit.color || "#3b82f6"} />;
+        case "Smile":
+        case "self_improvement": return <Smile size={20} color={habit.color || "#3b82f6"} />;
+        case "BookOpen":
+        case "menu_book": return <BookOpen size={20} color={habit.color || "#3b82f6"} />;
+        case "Bed":
+        case "bedtime": return <Bed size={20} color={habit.color || "#3b82f6"} />;
+        case "Briefcase":
+        case "work": return <Briefcase size={20} color={habit.color || "#3b82f6"} />;
+        case "Utensils":
+        case "restaurant": return <Utensils size={20} color={habit.color || "#3b82f6"} />;
+        case "MoreHorizontal":
+        case "more_horiz": return <MoreHorizontal size={20} color={habit.color || "#3b82f6"} />;
+        default: return <TargetIcon size={20} color={habit.color || "#3b82f6"} />;
+      }
+    };
+
+    const confirmDelete = () => {
+      Alert.alert(
+        "Delete Habit",
+        `Are you sure you want to delete "${habit.title}"?`,
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Delete", style: "destructive", onPress: () => deleteHabit(habit.id) }
+        ]
+      );
+    };
+
     return (
-      <View className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 mb-4 flex-row items-center justify-between shadow-sm">
+      <TouchableOpacity 
+        onLongPress={confirmDelete}
+        delayLongPress={500}
+        activeOpacity={0.8}
+        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 mb-4 flex-row items-center justify-between shadow-sm"
+      >
         <View className="flex-1 mr-4">
           <View className="flex-row items-center mb-1">
+            <View className="w-8 h-8 rounded-full items-center justify-center mr-2 bg-zinc-100 dark:bg-zinc-800">
+              {getIcon(habit.icon)}
+            </View>
             <Text className="text-zinc-900 dark:text-white text-lg font-semibold mr-2">{habit.title}</Text>
             <View className="bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded text-xs flex-row items-center">
               <CalendarDays size={12} color="#94a3b8" />
@@ -85,10 +134,19 @@ export default function AllHabits() {
             </View>
             
             {habit.target_value && (
-              <View className="flex-row items-center">
+              <View className="flex-row items-center mr-4">
                 <Target size={14} color="#a1a1aa" />
                 <Text className="text-zinc-500 dark:text-zinc-400 text-xs ml-1">
                   {habit.target_value} {habit.target_unit || "times"}
+                </Text>
+              </View>
+            )}
+
+            {habit.reminder_time && (
+              <View className="flex-row items-center">
+                <Bell size={14} color="#a1a1aa" />
+                <Text className="text-zinc-500 dark:text-zinc-400 text-xs ml-1">
+                  {habit.reminder_time}
                 </Text>
               </View>
             )}
@@ -109,7 +167,7 @@ export default function AllHabits() {
             <Check size={24} color="#fff" strokeWidth={3} />
           ) : null}
         </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
     );
   };
 

@@ -1,13 +1,14 @@
-import { useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, TextInput } from "react-native";
+import { useState, useCallback } from "react";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, TextInput, Alert } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "../../context/AuthContext";
-import { useTodayHabits, useHabitLogs } from "../../hooks/useHabits";
+import { useTodayHabits, useHabitLogs, useHabits } from "../../hooks/useHabits";
 import { calculateUserGamification } from "../../lib/habits";
-import { Check, Flame, Target, Trophy, Target as TargetIcon, TrendingUp, Search, Sparkles, X, Sun, Sunset, Moon } from "lucide-react-native";
+import { Check, Flame, Target, Trophy, Target as TargetIcon, TrendingUp, Search, Sparkles, X, Sun, Sunset, Moon, Dumbbell, Droplets, Smile, BookOpen, Bed, Briefcase, Utensils, MoreHorizontal, Bell } from "lucide-react-native";
 import { Habit } from "../../types";
 import { useSearch } from "../../context/SearchContext";
 import { AICoachWidget } from "../../components/AICoachWidget";
+import { useFocusEffect } from "expo-router";
 
 export default function Dashboard() {
   const insets = useSafeAreaInsets();
@@ -17,7 +18,14 @@ export default function Dashboard() {
   const [activeRoutineFilter, setActiveRoutineFilter] = useState<"all" | "morning" | "afternoon" | "evening">("all");
   const [activeFrequencyFilter, setActiveFrequencyFilter] = useState<"all" | "daily" | "weekly">("all");
   
-  const { todayHabits, isLoading, habitStreaks, getHabitStatus, allLogs } = useTodayHabits(user?.uid);
+  const { todayHabits, isLoading, habitStreaks, getHabitStatus, allLogs, refetchAll } = useTodayHabits(user?.uid);
+  const { deleteHabit } = useHabits(user?.uid);
+
+  useFocusEffect(
+    useCallback(() => {
+      refetchAll();
+    }, [refetchAll])
+  );
 
   // Gamification Logic
   const gamification = calculateUserGamification(todayHabits, allLogs);
@@ -84,10 +92,51 @@ export default function Dashboard() {
       }
     };
 
+    const getIcon = (iconName?: string) => {
+      switch (iconName) {
+        case "Dumbbell":
+        case "fitness_center": return <Dumbbell size={20} color={habit.color || "#3b82f6"} />;
+        case "Droplets":
+        case "water_drop": return <Droplets size={20} color={habit.color || "#3b82f6"} />;
+        case "Smile":
+        case "self_improvement": return <Smile size={20} color={habit.color || "#3b82f6"} />;
+        case "BookOpen":
+        case "menu_book": return <BookOpen size={20} color={habit.color || "#3b82f6"} />;
+        case "Bed":
+        case "bedtime": return <Bed size={20} color={habit.color || "#3b82f6"} />;
+        case "Briefcase":
+        case "work": return <Briefcase size={20} color={habit.color || "#3b82f6"} />;
+        case "Utensils":
+        case "restaurant": return <Utensils size={20} color={habit.color || "#3b82f6"} />;
+        case "MoreHorizontal":
+        case "more_horiz": return <MoreHorizontal size={20} color={habit.color || "#3b82f6"} />;
+        default: return <TargetIcon size={20} color={habit.color || "#3b82f6"} />;
+      }
+    };
+
+    const confirmDelete = () => {
+      Alert.alert(
+        "Delete Habit",
+        `Are you sure you want to delete "${habit.title}"?`,
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Delete", style: "destructive", onPress: () => deleteHabit(habit.id) }
+        ]
+      );
+    };
+
     return (
-      <View className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 mb-4 flex-row items-center justify-between shadow-sm">
+      <TouchableOpacity 
+        onLongPress={confirmDelete}
+        delayLongPress={500}
+        activeOpacity={0.8}
+        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 mb-4 flex-row items-center justify-between shadow-sm"
+      >
         <View className="flex-1 mr-4">
           <View className="flex-row items-center mb-1">
+            <View className="w-8 h-8 rounded-full items-center justify-center mr-2 bg-zinc-100 dark:bg-zinc-800">
+              {getIcon(habit.icon)}
+            </View>
             <Text className="text-zinc-900 dark:text-white text-lg font-semibold mr-2">{habit.title}</Text>
             {habit.time_of_day && habit.time_of_day !== "anytime" && (
               <View className="bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded">
@@ -109,10 +158,19 @@ export default function Dashboard() {
             </View>
             
             {habit.target_value && (
-              <View className="flex-row items-center">
+              <View className="flex-row items-center mr-4">
                 <Target size={14} color="#a1a1aa" />
                 <Text className="text-zinc-500 dark:text-zinc-400 text-xs ml-1">
                   {habit.target_value} {habit.target_unit || "times"}
+                </Text>
+              </View>
+            )}
+
+            {habit.reminder_time && (
+              <View className="flex-row items-center">
+                <Bell size={14} color="#a1a1aa" />
+                <Text className="text-zinc-500 dark:text-zinc-400 text-xs ml-1">
+                  {habit.reminder_time}
                 </Text>
               </View>
             )}
@@ -133,7 +191,7 @@ export default function Dashboard() {
             <Check size={24} color="#fff" strokeWidth={3} />
           ) : null}
         </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
     );
   };
 

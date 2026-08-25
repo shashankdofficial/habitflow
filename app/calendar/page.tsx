@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useHabits } from "@/hooks/useHabits";
+import { HabitIcon } from "@/components/HabitIcon";
 import { useQuery } from "@tanstack/react-query";
 import { getHabitLogs, calculateStreak } from "@/lib/habits";
 import { Navbar } from "@/components/Navbar";
@@ -302,7 +303,7 @@ export default function CalendarPage() {
                     return (
                       <div key={habit.id} className="flex items-center gap-3 p-3 rounded-xl border border-outline-variant/30 dark:border-zinc-800">
                         <div className="w-10 h-10 rounded-lg bg-surface-container-high dark:bg-zinc-800 flex items-center justify-center text-primary dark:text-zinc-300 font-bold shrink-0">
-                          {habit.icon.length === 1 ? habit.icon : habit.title.slice(0, 2).toUpperCase()}
+                          <HabitIcon icon={habit.icon} title={habit.title} className="text-[20px]" />
                         </div>
                         <div className="flex-grow overflow-hidden">
                           <p className="text-body-sm font-semibold truncate text-on-surface dark:text-zinc-200">{habit.title}</p>

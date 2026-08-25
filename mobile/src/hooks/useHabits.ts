@@ -22,6 +22,7 @@ export function useHabits(userId: string | undefined | null) {
     data: habits = [],
     isLoading,
     error,
+    refetch: refetchHabits,
   } = useQuery({
     queryKey: ["habits", userId],
     queryFn: () => (userId ? getHabits(userId) : []),
@@ -71,6 +72,7 @@ export function useHabits(userId: string | undefined | null) {
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
+    refetchHabits,
   };
 }
 
@@ -123,11 +125,11 @@ export function useHabitLogs(habitId: string) {
 }
 
 export function useTodayHabits(userId: string | undefined | null) {
-  const { habits, isLoading } = useHabits(userId);
+  const { habits, isLoading, refetchHabits } = useHabits(userId);
   const [allLogs, setAllLogs] = useState<HabitLog[]>([]);
 
   // Fetch all logs for today's habits to calculate streaks correctly
-  const { data: logsData } = useQuery({
+  const { data: logsData, refetch: refetchLogs } = useQuery({
     queryKey: ["allLogs", userId],
     queryFn: async () => {
       if (!userId || habits.length === 0) return [];
@@ -158,11 +160,17 @@ export function useTodayHabits(userId: string | undefined | null) {
     return getHabitStatusForDay(habitId, date, logs);
   };
 
+  const refetchAll = async () => {
+    await refetchHabits();
+    await refetchLogs();
+  };
+
   return {
     todayHabits,
     isLoading,
     habitStreaks,
     getHabitStatus,
     allLogs,
+    refetchAll,
   };
 }

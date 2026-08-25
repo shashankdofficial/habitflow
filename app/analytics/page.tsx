@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useHabits } from "@/hooks/useHabits";
+import { HabitIcon } from "@/components/HabitIcon";
 import { useQuery } from "@tanstack/react-query";
 import { getHabitLogs, calculateStreak } from "@/lib/habits";
 import { Navbar } from "@/components/Navbar";
@@ -328,7 +329,7 @@ export default function AnalyticsPage() {
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-3">
                           <div className="p-2 bg-surface-container dark:bg-zinc-800 rounded-lg text-primary dark:text-zinc-300 font-bold shrink-0">
-                            {habit.icon.length === 1 ? habit.icon : habit.title.slice(0, 2).toUpperCase()}
+                            <HabitIcon icon={habit.icon} title={habit.title} className="text-[20px]" />
                           </div>
                           <span className="font-semibold text-body-md text-on-surface dark:text-zinc-200">{habit.title}</span>
                         </div>

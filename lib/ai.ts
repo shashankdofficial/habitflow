@@ -18,15 +18,18 @@ export interface AIRecommendedHabit {
   icon: string;
 }
 
-// Active free models on OpenRouter (excluding models marked as "Going away")
+// Active free models on OpenRouter with correct API slugs
 const FREE_MODELS = [
-  "google/gemma-4-31b:free",
-  "google/gemma-4-26b-a4b:free",
+  "google/gemma-4-31b-it:free",
+  "google/gemma-4-26b-a4b-it:free",
   "nvidia/nemotron-3-ultra:free",
   "nvidia/nemotron-3-super:free",
   "nvidia/nemotron-3.5-lightning:free",
-  "zai/glm-5.2:free",
-  "liquid/lfm2.5-1.2b:free"
+  "z-ai/glm-5.2:free",
+  "thinkingmachines/inkling-small:free",
+  "liquid/lfm-2.5-2.6b:free",
+  "meta-llama/llama-3.3-70b-instruct:free",
+  "deepseek/deepseek-r1:free"
 ];
 
 async function callOpenRouter(prompt: string): Promise<string | null> {

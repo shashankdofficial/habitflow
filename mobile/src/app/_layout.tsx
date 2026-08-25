@@ -4,7 +4,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
-import { View, ActivityIndicator } from "react-native";
+import { View, ActivityIndicator, Appearance } from "react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SearchProvider } from "../context/SearchContext";
 import { useColorScheme } from "nativewind";
@@ -28,9 +28,11 @@ function InitialLayout() {
         const savedTheme = await AsyncStorage.getItem("habitflow_theme");
         if (savedTheme) {
           setColorScheme(savedTheme as "light" | "dark");
+          Appearance.setColorScheme(savedTheme as "light" | "dark");
         } else {
           // Default to light for new users
           setColorScheme("light");
+          Appearance.setColorScheme("light");
         }
       } catch (err) {
         console.warn("Failed to load theme", err);
@@ -56,14 +58,14 @@ function InitialLayout() {
 
   if (loading || !themeLoaded) {
     return (
-      <View className={`flex-1 items-center justify-center ${isDark ? "dark bg-zinc-950" : "bg-zinc-50"}`}>
+      <View className="flex-1 items-center justify-center bg-zinc-50 dark:bg-zinc-950">
         <ActivityIndicator size="large" color="#3b82f6" />
       </View>
     );
   }
 
   return (
-    <View className={`flex-1 ${isDark ? "dark bg-zinc-950" : "bg-zinc-50"}`}>
+    <View className="flex-1 bg-zinc-50 dark:bg-zinc-950">
       <StatusBar style={isDark ? "light" : "dark"} />
       <Slot />
     </View>
