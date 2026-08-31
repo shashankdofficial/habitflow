@@ -32,3 +32,5 @@ dist-ssr
 .parcel-cache
 .vercel
 out
+
+mobile/
